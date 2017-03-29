@@ -9,8 +9,8 @@
 
 <meta name="author" content="Joe"> 
 
-<meta name="description" content="NPM Packages At this point, node has become an integral part of web development.
-Even though most web developers are not node developers, the suite &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="I recently wrote about how to use json-server to mock api calls when writing web apps.
+And that is very useful when you want write code and not have &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -98,226 +98,6 @@ $(document).ready(
 </header>
 
 	<div id="content" class="inner">
-
-
-    <article class="post">
-	<h2 class="title">
-		
-		<a href="/blog/2016/05/31/building-an-npm-package-part-1/">
-		
-			Building an Npm Package: Part 1 Planning</a>
-	</h2>
-	<div class="entry-content">
-		<h2>NPM Packages</h2>
-
-<p>At this point, node has become an integral part of web development.
-Even though most web developers are not node developers, the suite of command line tools built on node is just too good to ignore.
-And at the core of this suite of tools, is the node package manager, NPM.</p>
-
-<p>I recently have been working a bit with gitlab through a project at work and decided to write a small api wrapper as a node project.
-This is my attempt to document what it means to write a package for npm in 2016.
-I&rsquo;m sure this will be laughingly out of date in a few months, but that&rsquo;s all the more reason to continue writing simple tutorials to explain
-some things that may not be clear from the documentation.</p>
-
-<p>To start, I&rsquo;ll go through somethings I considered while planning the project.</p>
-
-<h2>Who is the package for?</h2>
-
-<p>This is an obvious question, but it has some important implications.
-A node package, unlike, say, an enterprise application, has the advantage of being code-centric.
-It&rsquo;s an opportunity for us to scratch our own itch as they say.
-In my case, I wanted to make an interface for the gitlab api so that I could automate the manipulation of certain tickets.</p>
-
-<p>I also knew that I wanted it to to be a front-end application.
-There was no particular reason for this other than that&rsquo;s what I happen to be writing a lot of these days, so I could do a lot of the non-gitlab stuff quickly.</p>
-
-<p>I also, admittedly, want to showcase some of my code writing abilities as well as contribute to the open source community.
-As a result, I wanted it to be absolutely pristine and a model of well-built code.</p>
-
-<h2>Making Choices</h2>
-
-<p>With this in mind, I needed to start making choices. I&rsquo;ll list them out and then consider each in turn:</p>
-
-<ul>
-<li>Should this be a <em>javascript</em> project or a <em>node</em> project?</li>
-<li>Should I have one entry point or multiple entry points?</li>
-<li>Should it be one large package or a series of smaller packages?</li>
-<li>How much testing/linting/code coverage should I focus on particularly in the early stages?</li>
-</ul>
-
-
-<h2>Javascript vs. Node</h2>
-
-<p>If NPM has one flaw, it is that node packages are mixed in with pure javascript packages.
-This doesn&rsquo;t matter too often, but occasionally things just will not work in a pure javascript environment.</p>
-
-<p>In fact, that is where I got the idea for writing this project in the first place.
-There were several gitlab api wrappers available on npm, but they all required some node dependencies that were not available for front-end code.
-In addition, the file size could be very large.
-They included a lot of additional dependencies and covered lots of the interface.</p>
-
-<p>These are great for server-side code, but for me it was overkill.
-Not to mention they straight up do not work.</p>
-
-<p>In addition, although it is a little trivial, they were written in mostly es5 syntax, which is all well and good,
-but now I have chance to improve on that, and I was happy to seize the opportunity.</p>
-
-<h2>Single Entry Point or Multiple Entry Points?</h2>
-
-<p>My next decision was whether to make a single entry point or multiple entry points.
-The <a href="https://github.com/gitlabhq/gitlabhq/tree/master/doc/api">gitlab api</a> is very large.
-As a result, any package that covers everything would also be very large.</p>
-
-<p>However, you can&rsquo;t beat the convenience of a single entry point.
-Here&rsquo;s an example from a <a href="https://www.npmjs.com/package/node-gitlab">node version of the gitlab wrapper</a>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">gitlab</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;node-gitlab&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">client</span> <span class="o">=</span> <span class="nx">gitlab</span><span class="p">.</span><span class="nx">createPromise</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">api</span><span class="o">:</span> <span class="s1">&#39;https://gitlab.com/api/v3&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">privateToken</span><span class="o">:</span> <span class="s1">&#39;your private token&#39;</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">client</span><span class="p">.</span><span class="nx">milestones</span><span class="p">.</span><span class="nx">list</span><span class="p">({</span><span class="nx">id</span><span class="o">:</span> <span class="mi">1</span><span class="p">})</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">milestones</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">milestones</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'>  <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">throw</span> <span class="nx">err</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Once the client is set up, you have one large object that can fetch anything your heart desires.</p>
-
-<p>However, as someone who has been writing front-end javascript for some time, I&rsquo;m very sensitive to large dependencies especially if I only need a small subset of the package.</p>
-
-<p>In other words, I want to be able to do this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">milestones</span><span class="p">}</span> <span class="nx">from</span> <span class="nx">gitlab</span><span class="o">-</span><span class="nx">wrapper</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">const</span> <span class="nx">miles</span> <span class="o">=</span> <span class="nx">milestones</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">api</span><span class="o">:</span> <span class="s1">&#39;url&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">token</span><span class="o">:</span> <span class="s1">&#39;token&#39;</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Rather than this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">gitlab</span> <span class="nx">from</span> <span class="nx">gitlab</span><span class="o">-</span><span class="nx">wrapper</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kr">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="nx">gitlab</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">api</span><span class="o">:</span> <span class="s1">&#39;url&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">token</span><span class="o">:</span> <span class="s1">&#39;token&#39;</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="p">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>With that option available everything will be much smaller.</p>
-
-<p>Although it seems straightforward, it did cause some confusion. More on that later.</p>
-
-<h2>Should it be one large package or a series of smaller packages?</h2>
-
-<p>I am using (redux)[<a href="https://github.com/reactjs/redux">https://github.com/reactjs/redux</a>] as one of my models for what a great package can be.
-I was particularly impressed with how the package was broken out into independent entities.</p>
-
-<p>There are separate projects for the (thunk middleware)[<a href="https://github.com/gaearon/redux-thunk">https://github.com/gaearon/redux-thunk</a>] and
-the (hot loader)[<a href="https://github.com/gaearon/react-hot-loader">https://github.com/gaearon/react-hot-loader</a>] and so on.</p>
-
-<p>The big advantage there is that each project has a very specific scope and can be focused on and released independently.
-I was attracted to how this would make developing easier (in theory) and, of course, conform to current trends for small independent pieces of code.</p>
-
-<p>However, I ultimately abandoned this idea because this multiple entry points will cover the size issue and the scope of the project seemed clear; it will be a wrapper for the gitlab api.
-Breaking it up further just seemed, odd.
-It seemed forced, so multiple entry points it will be.</p>
-
-<h2>How much testing/linting/code coverage should I focus on particularly in the early stages?</h2>
-
-<p>I&rsquo;ve been the victim of premature optimization before.
-However, I&rsquo;ve more often been the victim of rushed code, so I wanted to make sure everything was clean and tested.</p>
-
-<p>The problem was there was a lot of boilerplate stuff to set up. Here&rsquo;s a partial list (because I can&rsquo;t remember everything):</p>
-
-<ul>
-<li>Babel</li>
-<li>Babel Presets</li>
-<li>Webpack</li>
-<li>Mocha</li>
-<li>Configuring Mocha to work with Babel</li>
-<li>Code Coverage with Istanbul</li>
-</ul>
-
-
-<p>Not a huge list, but geez.
-I still need to add in linting (mostly because inconsistent styling is one my main vices), but decided I should probably, you know, write some code at some time.</p>
-
-<p>In the end, it is worth it, but what a pain.</p>
-
-<h2>Now to begin</h2>
-
-<p>Hurray, decisions have been made, baselines have been established, and now it is time to jump in.
-Next step, creating a package.json file and setting up the file structure for multiple entry points.</p>
-
-		
-		
-	</div>
-
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-05-31T16:21:27-05:00" pubdate data-updated="true"></time></div>
-	
-
-<div class="tags">
-
-	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/npm/'>npm</a>
-
-</div>
-
-
-	
-</div></article>
 
 
     <article class="post">
@@ -2464,6 +2244,320 @@ Each version works perfectly fine, but one will have a much greater chance of be
 <div class="tags">
 
 	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/react/'>react</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2015/09/03/creating-scrolling-self-drawing-lines/">
+		
+			Creating Scrolling Self-Drawing Lines</a>
+	</h2>
+	<div class="entry-content">
+		<p>First of all here&rsquo;s a demo. Scroll inside the codepen to view:</p>
+
+<p data-height="268" data-theme-id="0" data-slug-hash="QjNbgz" data-default-tab="result" data-user="jsmapr1" class='codepen'>See the Pen <a href='http://codepen.io/jsmapr1/pen/QjNbgz/'>QjNbgz</a> by Joe Morgan (<a href='http://codepen.io/jsmapr1'>@jsmapr1</a>) on <a href='http://codepen.io'>CodePen</a>.</p>
+
+
+<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+
+<p>My office recently designed a campaign to encourage student applications as a deadline neared.
+Our goal was to create a very unique and engaging page for potential students and the designers settled on a theme of motion and inertia.
+Translating that into an experience on the web was a little more difficult.
+We needed something that pulled the viewer along, that interacted with them, but did not try to control the pace.
+After taking inspiration from a few sites (<a href="http://pitchfork.com/features/cover-story/reader/streaming/">particularly this one</a>) we created a design that would generate a self drawing line that responded to the user as they scrolled.
+When a user scrolled down the page, the line drawing would be built. If they scrolled backwards, it would undo itself.</p>
+
+<p>The concept was simple and effective. It was unique enough to create an experience that would engage the viewer and set us apart from the noise.
+The best part was that the JavaScript ended up being surprisingly simple. Here are the steps in brief:</p>
+
+<ol>
+<li>Calculate the length of an SVG</li>
+<li>Create a dash the length of the SVG (making it appear invisible)</li>
+<li>Set a start point and an end point relative to the top and bottom of the svg (could also be relative to another element)</li>
+<li>Calculate the distance between the top and the bottom</li>
+<li>Calculate the amount of pixels that must be added per pixel of vertical scroll</li>
+<li>Attach an method to the scroll event that adds pixels (removes the dash)</li>
+</ol>
+
+
+<p>Not bad, huh?</p>
+
+<h2>Calculate the length of an SVG</h2>
+
+<p>This is actually pretty straight forward. The key is having an SVG that is only a path:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;svg</span>  <span class="na">enable-background=</span><span class="s">&quot;new 0 0 612 792&quot;</span> <span class="na">version=</span><span class="s">&quot;1.1&quot;</span> <span class="na">viewBox=</span><span class="s">&quot;0 0 612 792&quot;</span> <span class="na">x=</span><span class="s">&quot;0px&quot;</span> <span class="na">y=</span><span class="s">&quot;0px&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;path</span> <span class="na">d=</span><span class="s">&quot;M133.7-2.2l157.1,368V792&quot;</span> <span class="na">fill=</span><span class="s">&quot;none&quot;</span>    <span class="na">id=</span><span class="s">&quot;line&quot;</span> <span class="na">stroke=</span><span class="s">&quot;#E11837&quot;</span> <span class="na">stroke-miterlimit=</span><span class="s">&quot;10&quot;</span> <span class="na">stroke-width=</span><span class="s">&quot;2&quot;</span> <span class="nt">&gt;&lt;/path&gt;</span>
+</span><span class='line'><span class="nt">&lt;/svg&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can easily get the length of the path using a <a href="https://developer.mozilla.org/en-US/docs/Web/API/SVGPathElement">path method</a>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;line&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">svg</span><span class="p">.</span><span class="nx">getTotalLength</span><span class="p">();</span>
+</span><span class='line'><span class="c1">//826.331</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Create a dash the length of the SVG</h2>
+
+<p>With the length of the path calculated, make dash on the path that is the exact same lenght.
+This will make the path invisible:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">path</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">strokeDasharray</span> <span class="o">=</span> <span class="nx">svg</span><span class="p">.</span><span class="nx">getTotalLength</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Set a start point and an end point relative to the top and bottom of the SVG</h2>
+
+<p>The next step is where it gets a little tricky.
+There needs to be a starting and a stopping point on the screen to trigger the beginning (or end) of the animation.
+This will be determined by calculating the distance of the start point from the top of the page.
+To determine this, I used the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRec://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect">getBoundClinetRect method</a>.
+This works on any html element and returns a nice object giving the location of the element&rsquo;s bounds <em>relative to the viewPort</em>.</p>
+
+<p>The result looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">path</span><span class="p">.</span><span class="nx">getBoundingClientRect</span><span class="p">();</span>
+</span><span class='line'><span class="c1">//</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">bottom</span><span class="o">:</span> <span class="mf">2455.22607421875</span>
+</span><span class='line'>    <span class="nx">height</span><span class="o">:</span> <span class="mf">1816.79736328125</span>
+</span><span class='line'>    <span class="nx">left</span><span class="o">:</span> <span class="mf">215.84967041015625</span>
+</span><span class='line'>    <span class="nx">right</span><span class="o">:</span> <span class="mf">575.228759765625</span>
+</span><span class='line'>    <span class="nx">top</span><span class="o">:</span> <span class="mf">638.4287109375</span>
+</span><span class='line'>    <span class="nx">width</span><span class="o">:</span> <span class="mf">359.3790893554687</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>From that we need to find the absolute position.
+To do that, get the top position of the body tag.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">getBoundingClientRect</span><span class="p">().</span><span class="nx">top</span><span class="p">;</span>
+</span><span class='line'><span class="c1">//-427</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since this is relative to the view port, it will almost certainly be a negative number.
+To get the start point relative to the top of the body, just subtract the top of the body from the top of the element.
+From above, this would be 638 - -427. So the start of the element is 1065 pixels from the top of the page.
+Now this will all be fine except for that would start the animation when the top of the element is at the top of the viewPort.
+The result is that the animation would always be just barely out of view.
+That is less than ideal and wouldn&rsquo;t create the desired effect.</p>
+
+<p>The last step is subtracting the distance from the top of the viewPort that we want the effect to start resulting in a start point start point <em>above</em> the top of the SVG.
+In other words, if an SVG starts 1000px from the top of the body and the viewport is 100px high (why not) and we want it to start when the top of the SVG is in the middle of the viewport, then the animation <em>really</em> needs to start 950px from the top of the body.
+The ability to set the start and stopping point is one of the best ways to control the speed and visual affect of an SVG.
+If we want the SVG to coming shooting out of the top of the screen, we can set it to start after the page has past it&rsquo;s starting point (make it a negative number, -2).
+If we want the SVG to begin before we hit a visible area, all we need to do is set the start number higher than 1 (1.2) for example.</p>
+
+<p>The end point is pretty much the same, except we get the bottom of the SVG bounding container. Everything else is the same.</p>
+
+<h2>Calculate the distance between the top and the bottom</h2>
+
+<p>With the start and the end points set, the distance is a simple subtraction.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">this</span><span class="p">.</span><span class="nx">verticalDistance</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">start</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">end</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>However, we need to be able to recalculate this on the fly.
+So we really need to know both the total distance and  the remaining distance.
+This can be figured out using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY">window.pageYOffset/window.scrollY</a>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">\\</span><span class="nx">Defined</span> <span class="k">in</span> <span class="nx">the</span> <span class="nx">animate</span> <span class="nx">line</span> <span class="kd">function</span>
+</span><span class='line'><span class="k">this</span><span class="p">.</span><span class="nx">currentVisiblePosition</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">pageYOffset</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Scroller</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">distanceRemaining</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">end</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">currentVisiblePosition</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Calculate the amount of pixels that must be added per pixel of vertical scroll</h2>
+
+<p>With the SVG length and starting and stopping points established, all that&rsquo;s left is to figure out how much to add reveal as the user scrolls down.
+That is easily accomplished with a simple function:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">\\</span> <span class="nx">Add</span> <span class="nx">to</span> <span class="nx">the</span> <span class="nx">prototype</span>
+</span><span class='line'><span class="nx">Scroller</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">pixelsPerVerticalScroll</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">verticalDistance</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">end</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">start</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">svgLength</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">verticalDistance</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Attach an method to the scroll event that adds pixels (removes the dash)</h2>
+
+<p>Finally, we just need to attach a method to the scroll event so that the line will be continually updated.
+It&rsquo;s going to have three parts:</p>
+
+<ol>
+<li>If we are before the start point: Show nothing.</li>
+<li>If we are after the end poing: Show everything.</li>
+<li>If we are between the start and the end point: Show the correct percentage.</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="err">\\</span> <span class="nx">Attach</span> <span class="nx">the</span> <span class="nx">scroll</span> <span class="nx">even</span> <span class="nx">during</span> <span class="nx">the</span> <span class="nx">init</span> <span class="kd">function</span>
+</span><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;scroll&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">animateLine</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Scroller</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">animateLine</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">currentVisiblePosition</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">pageYOffset</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">currentVisiblePosition</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">start</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">strokeDashoffset</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">svgLength</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">currentVisiblePosition</span> <span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">strokeDashoffset</span> <span class="o">=</span> <span class="s1">&#39;0px&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">currentVisiblePosition</span> <span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">start</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">currentVisiblePosition</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">strokeDashoffset</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">distanceRemaining</span><span class="p">()</span> <span class="o">*</span> <span class="k">this</span><span class="p">.</span><span class="nx">pixelsPerVerticalScroll</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;px&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Initializing</h2>
+
+<p>The initialization will set most of the values:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Scroller</span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">svg</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">el</span><span class="p">;</span>
+</span><span class='line'>  <span class="c1">//Animation will end when the end is at which point of othe page. .9 is at about 90% down the page/</span>
+</span><span class='line'>  <span class="c1">// .1 is 10% from the top of the page. Default is middle of the page.</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">animationBounds</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">animationBounds</span><span class="p">.</span><span class="nx">top</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">startPoint</span> <span class="o">||</span> <span class="p">.</span><span class="mi">5</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">animationBounds</span><span class="p">.</span><span class="nx">bottom</span> <span class="o">=</span> <span class="nx">options</span><span class="p">.</span><span class="nx">endPoint</span> <span class="o">||</span> <span class="p">.</span><span class="mi">5</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">animationBounds</span><span class="p">.</span><span class="nx">containerBounds</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">getBoundingClientRect</span><span class="p">();</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">start</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getPagePosition</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">end</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getPagePosition</span><span class="p">(</span><span class="s1">&#39;bottom&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">svgLength</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">getTotalLength</span><span class="p">();</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">svg</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">strokeDasharray</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">svgLength</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">animateLine</span><span class="p">();</span>
+</span><span class='line'>  <span class="nb">window</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;scroll&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">animateLine</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>From there, we can easily add as many as we want. All we need is an ID on the SVG</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">new</span> <span class="nx">Scroller</span><span class="p">({</span>
+</span><span class='line'>  <span class="s1">&#39;el&#39;</span><span class="o">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;mySvg&#39;</span><span class="p">),</span>
+</span><span class='line'>  <span class="s1">&#39;startPoint&#39;</span><span class="o">:</span> <span class="nx">startPoint</span><span class="p">,</span>
+</span><span class='line'>  <span class="s1">&#39;endPoint&#39;</span><span class="o">:</span> <span class="nx">endPoint</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There were a few other ideas I played with. I considered adding a stop and start to a container element rather than the SVG itself.
+This wouldn&rsquo;t be too hard, the only change would be to specify the startPoint and endPoint belong to a different element.
+I also considered adding a pause point, but that required too many extra considerations that would depend on screen width and such.
+For now, I left it simple and it worked out very well.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-09-03T16:49:04-05:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>
 
 </div>
 
