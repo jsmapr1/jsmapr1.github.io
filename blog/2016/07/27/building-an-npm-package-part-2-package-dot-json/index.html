@@ -1,0 +1,405 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script data-cfasync="false" type="text/javascript" src="//use.typekit.net/axj3cfp.js"></script>
+	<script data-cfasync="false" type="text/javascript">try{Typekit.load();}catch(e){}</script>
+	<meta charset="utf-8">
+	<title>Building an NPM Package Part 2: Package.json  | Dev</title>
+
+<meta name="author" content="Joe"> 
+
+<meta name="description" content="Anytime I begin to look deeply into an open source project should begin at the package file.
+The reason I do this is because it gives a starting &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Dev" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/javascripts/jquery.fancybox.pack.js"></script>
+
+<script language="Javascript" type="text/javascript">
+$(document).ready(
+  function() {
+    (function($) {
+      $(".fancybox[data-content-id]").each(function() {
+        this.href = $(this).data('content-id');
+      });
+      $(".fancybox").fancybox({
+        beforeLoad: function() {
+          var el, 
+              id = $(this.element).data('title-id');
+
+          if (id) {
+            el = $('#' + id);
+
+            if (el.length) {
+              this.title = el.html();
+            }
+          }
+          if ($(this).data('content')) {
+            this.content = $(this).data('content');
+          }
+        },
+        helpers: {
+          title: {
+            type: 'inside'
+          }
+        }
+      });
+    })(jQuery);
+  }
+);
+</script>
+
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Dev</a></h1>
+<h4>The Art of Working With Code(rs)</h4>
+<nav id="main-nav"><ul>
+	<li><a href="/">Blog</a></li>
+	<li><a href="/about">About</a></li>
+	<li><a href="/portfolio">Portfolio</a></li>
+	<li><a href="/archives">Archive</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/">Blog</a></li>
+	<li><a href="/about">About</a></li>
+	<li><a href="/portfolio">Portfolio</a></li>
+	<li><a href="/archives">Archive</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.thejoemorgan.com">
+			</form>
+		</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Building an NPM Package Part 2: Package.json</h2>
+	<div class="entry-content"><p>Anytime I begin to look deeply into an open source project should begin at the package file.
+The reason I do this is because it gives a starting point for nearly everything and I can easily get a lot of clues about the project from these points.</p>
+
+<p>Most modern web projects have something like a package file.
+Some languages make this easier than others; the package.json file or composer.json file have scripts and dependencies along with other goodies.
+Other projects split them out a bit; Ruby has a gemfile, but also a rakefile with various scripts.</p>
+
+<p>Nonetheless, it is a good starting point no matter the language.
+And fortunately for us, npm is one of the best, I would say the best, out there.
+It&rsquo;s a nice time to be a javascript developer.</p>
+
+<h1>Package.json</h1>
+
+<p>With that in mind, let&rsquo;s dive in.
+I&rsquo;m not going to go into detail about every single field.
+The <a href="https://docs.npmjs.com/files/package.json">documentation</a> is actually very good, so there&rsquo;s no reason to duplicate effort.
+Instead, I will point out a few particulars that I enjoy using and enjoy seeing others use.</p>
+
+<h1>main</h1>
+
+<p>This is the primary entry point for your script.</p>
+
+<p>When a user types:<code>require('your-package')</code> or <code>import yourPackage from your-package</code> the main file is what that import will refernce.</p>
+
+<p>As <a href="/blog/2016/05/31/building-an-npm-package-part-1/">mentioned previously</a> this is something to consider if you want a single entry point or multiple entry points.</p>
+
+<p>There can be only one main file, but the rest of the structure of the project will determine how other pieces can be imported.
+For example, if you have other chunks of code in the <strong>cool</strong> directory, than a user can import by referencing that directory (e.g. <code>import {coolaid} from 'cool-package/cool/superCool'</code>).
+More on this later.</p>
+
+<p>For most projects this will be something like <code>main.js</code> or <code>index.js</code>.</p>
+
+<h1>bin</h1>
+
+<p>I haven&rsquo;t used this on any projects, but this is how you specify a project that should be placed in the PATH.
+In other words, this is how you create a command line utility (think mocha or babel or, well, anything you run from the command line).</p>
+
+<p>The syntax is simple. For a command line that is the same as the package name, it is simply: <code>bin: './path/to/executable'</code>.
+You can also specify a name in an object:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;my&quot;</span><span class="o">:</span> <span class="s2">&quot;./path/to/my-package&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Again, as an example, here is the bin for mocha</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;_mocha&quot;</span><span class="o">:</span> <span class="s2">&quot;./bin/_mocha&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;mocha&quot;</span><span class="o">:</span> <span class="s2">&quot;./bin/mocha&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you are curious, if you want to install a file with a command line interface that is installed only in a project,
+you just have to specify the path to the node_modules bin e.g. <code>node_modules/.bin/mocha</code>.</p>
+
+<p>You can also reference the module in a npm script and the correct path will be inferred.</p>
+
+<p>Speaking of scripts&hellip;</p>
+
+<h1>script</h1>
+
+<p>This is by far my favorite part of npm (other than packaging dependencies).</p>
+
+<p>I&rsquo;ve signed on to the <a href="https://medium.freecodecamp.com/why-i-left-gulp-and-grunt-for-npm-scripts-3d6853dd22b8#.fhl757bda">recent trend</a> of using <a href="http://blog.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/">npm scripts in lieu of gulp or grunt or any of those things</a>.</p>
+
+<p>Why? There are two reasons. The first is that it is much easier to play around with scripts at the command line.
+That is, it&rsquo;s much easier to experiment with different flags and options from the command line and then, once it is working correctly, I just shove it into an npm script.</p>
+
+<p>Secondly, as I mentioned at the beginning, a package.json file is a great place to get an idea of what a project does and seeing the scripts is a big part of that.</p>
+
+<p>Here&rsquo;s one that I particularly like from <a href="">redux-thunk</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;clean&quot;</span><span class="o">:</span> <span class="s2">&quot;rimraf lib dist es&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build&quot;</span><span class="o">:</span> <span class="s2">&quot;npm run build:commonjs &amp;&amp; npm run build:umd &amp;&amp; npm run build:umd:min &amp;&amp; npm run build:es&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;prepublish&quot;</span><span class="o">:</span> <span class="s2">&quot;npm run clean &amp;&amp; npm run test &amp;&amp; npm run build&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;posttest&quot;</span><span class="o">:</span> <span class="s2">&quot;npm run lint&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;lint&quot;</span><span class="o">:</span> <span class="s2">&quot;eslint src test&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;test&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=commonjs mocha --compilers js:babel-core/register --reporter spec test/*.js&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build:commonjs&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=commonjs babel src --out-dir lib&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build:es&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=es babel src --out-dir es&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build:umd&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=commonjs NODE_ENV=development webpack&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build:umd:min&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=commonjs NODE_ENV=production webpack&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I like this because I can see exactly how a high-quality package is built and maintained.
+I can see which testing suite is used. The location of the tests (in this case it would have been obvious, but still).
+I can see how the build is implemented and so on.</p>
+
+<p>Finally, as a potential contributor, it&rsquo;s fairly obvious what I need to do to make sure that the integrity of the project is maintained.
+I don&rsquo;t need to worry about having gulp globally installed or mocha. It&rsquo;s all packaged and referenced.
+I just need to run <code>npm test</code> to test and <code>npm run lint</code> to lint.
+Super easy.</p>
+
+<p>Ok, enough gushing.
+There is a <a href="https://docs.npmjs.com/misc/scripts">a lot you can do with scripts</a>, but here are some of the best use cases:</p>
+
+<ul>
+<li><strong>test</strong>: Always have tests. This is a reserved script, so you can run it by simply typing <code>npm test</code></li>
+<li><strong>lint</strong>: Always lint your code. This is not reserved, so you must run <code>npm run lint</code></li>
+<li><strong>start</strong>: This is another reserved script, add in whatever you need to get a server up and running. If you have a server.js file, you do not need to write the script, but I think you should so it will be clear to future users.</li>
+<li><strong>prepublish</strong>: This is a script that will run when you publish your project. This matters because you do not need to check in transpiled code.
+For example. This script <code>"prepublish": "npm run build"</code> will run the build script <code>"build": "babel src -d ./"</code> which will compile the es6 code into the root directory.
+I also could have it compile to a build directory <code>"build": "babel src -d ./build",</code>, but that would make importing from non-main files a little less intuitive.</li>
+<li><strong>anything</strong>: I have a rule that if I type something more than once a day (in regards to a package) it should go in a script since future users will likely need to do it too. For example, I had a recent project that I would deploy to production.
+Since I&rsquo;m not planning on publishing this as an npm package, I just added a deploy script, so <code>npm run deploy</code> would update the server. Sure, it&rsquo;s not a full one CI build (i.e. if tests are breaking, it would still deploy), but it worked in my situation.</li>
+</ul>
+
+
+<p>Learn to love scripts. Your life will be better.</p>
+
+<h1>All the other things</h1>
+
+<p>There&rsquo;s lots, lots, lots more, but those are better explored on a case-by-case basis.
+However, there are best practices, so if you are planning on publishing, be sure to add:</p>
+
+<ul>
+<li><strong>name</strong>: Obviously.</li>
+<li><strong>descript</strong>: Obviously.</li>
+<li><strong>keywords</strong>: Make it easier to be discovered</li>
+<li><strong>bugs</strong>: Location for issues (usually on github/project/issues)</li>
+<li><strong>license</strong>: Part of <code>npm init</code> so it&rsquo;s easy to remember. Lots of options, though.</li>
+<li><strong>version</strong>: I prefere Major.Minor.Patch. Change the first number on breaking changes or major new features. The second on new features, but no breaks. And the third for, well, patches to existing features.</li>
+</ul>
+
+
+<p>Again, the documentation is great, so peruse it occasionally or before you publish to make sure you have everything.</p>
+
+<h1>Putting it together: Making multiple entry points</h1>
+
+<p>To return to a goal from the <a href="/blog/2016/05/31/building-an-npm-package-part-1/">planning stage</a>, how can we use our package.json file to create an npm package with multiple entry points?</p>
+
+<p>It&rsquo;s actually fairly simple. The trick is to understand that there will need to be a little structure, but it can be simple and clear.</p>
+
+<p>Let&rsquo;s start with a file structure such as this:</p>
+
+<pre>
+-- src/
+    -- index.js
+    -- components/
+        -- cool.js
+        -- awesome.js
+</pre>
+
+
+<p>In our package.json file set <strong>main</strong> to be index.js.
+Then in the build script, set the output to the root of the project.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="s2">&quot;main&quot;</span><span class="o">:</span> <span class="s2">&quot;index.js&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;build&quot;</span><span class="o">:</span> <span class="s2">&quot;babel src -d ./&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;prepublish&quot;</span><span class="o">:</span> <span class="s2">&quot;npm run build&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s all there is to it.
+Now when a user can import the default along with other components not in the main file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">yourPackage</span> <span class="nx">from</span> <span class="s1">&#39;your-package&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">cool</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;your-package/components/cool&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can, of course, link everything from your main file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//inside index.js</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">cool</span><span class="p">,</span> <span class="nx">rad</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/cool&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">awesome</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/awesome&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">cool</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">rad</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">awesome</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But that has the downside of growing out of control rather quickly.
+Personally, I like have nested, separate functions, but it&rsquo;s a choice every author must make.</p>
+
+<p>So there you have it.
+The <em>package.json</em> file is great and there&rsquo;s tons that you can do with it.
+I know I just barely scratched the surface.
+As a recommendation, when ever you have some time to kill, look up your favorite npm package on github and take a few minutes to explore the package.json file and the project structure.
+It will give you many sources for ideas on your own projects.</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-07-27T08:16:05-05:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/npm/'>npm</a>
+
+</div>
+
+
+	
+</div></article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+<!---	<a class="addthis_counter addthis_pill_style"></a> --->
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2017
+
+    Joe
+
+<br>
+Powered by Octopress.
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+ })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-84697313-1');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+</body>
+</html>

@@ -1,1 +1,2639 @@
-My Octopress Page is coming soon &hellip;
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script data-cfasync="false" type="text/javascript" src="//use.typekit.net/axj3cfp.js"></script>
+	<script data-cfasync="false" type="text/javascript">try{Typekit.load();}catch(e){}</script>
+	<meta charset="utf-8">
+	<title>The Art of Working With Code(rs)  | Dev</title>
+
+<meta name="author" content="Joe"> 
+
+<meta name="description" content="High Order Components High order components in React are great ways to share functionality and build
+new components, but I have found that the &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Dev" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<link href="/stylesheets/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="/javascripts/jquery.fancybox.pack.js"></script>
+
+<script language="Javascript" type="text/javascript">
+$(document).ready(
+  function() {
+    (function($) {
+      $(".fancybox[data-content-id]").each(function() {
+        this.href = $(this).data('content-id');
+      });
+      $(".fancybox").fancybox({
+        beforeLoad: function() {
+          var el, 
+              id = $(this.element).data('title-id');
+
+          if (id) {
+            el = $('#' + id);
+
+            if (el.length) {
+              this.title = el.html();
+            }
+          }
+          if ($(this).data('content')) {
+            this.content = $(this).data('content');
+          }
+        },
+        helpers: {
+          title: {
+            type: 'inside'
+          }
+        }
+      });
+    })(jQuery);
+  }
+);
+</script>
+
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">Dev</a></h1>
+<h4>The Art of Working With Code(rs)</h4>
+<nav id="main-nav"><ul>
+	<li><a href="/">Blog</a></li>
+	<li><a href="/about">About</a></li>
+	<li><a href="/portfolio">Portfolio</a></li>
+	<li><a href="/archives">Archive</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/">Blog</a></li>
+	<li><a href="/about">About</a></li>
+	<li><a href="/portfolio">Portfolio</a></li>
+	<li><a href="/archives">Archive</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="https://www.google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:www.thejoemorgan.com">
+			</form>
+		</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner">
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2017/02/28/testing-high-order-components-in-react/">
+		
+			Building and Testing High Order Components in React</a>
+	</h2>
+	<div class="entry-content">
+		<h2>High Order Components</h2>
+
+<p>High order components in React are great ways to share functionality and build
+new components, but I have found that the information about how to use them is
+overly complicated and there is very little information about how to test them.</p>
+
+<h3>HoC Keep It Simple</h3>
+
+<p>In short, you should use a high order component when you want to share
+functionality between different components and this functionality requires some
+form of local state or local config.</p>
+
+<p>There are more reasons to use these, sure, but the majority of the time I
+refactor code into a high order component &ndash; notice I said refactor, I almost
+never write an HoC to start because I don&rsquo;t like to overcomplicate things until
+I need a reason &ndash; I do so because I want to use some functionality in a
+different place.</p>
+
+<p>Perhaps you&rsquo;ve heard the phrase &lsquo;favor composition over inheritance&rsquo; well, this
+is how composition works. We are taking a component and adding the functionality
+we want instead of inheriting the functionality and all the other baggage with
+it.</p>
+
+<p>Here&rsquo;s an example. We have a component, a button, and we want it to use Redux.
+So we use the high order component <code>connect</code> we also want it to have a
+confirmation, so we use the high order component <code>withConfirm</code> which we will
+build out in the next section. The resulting code has two added functionality,
+but no more than we need:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="nx">connect</span><span class="p">(</span><span class="nx">stateToProps</span><span class="p">)(</span><span class="nx">withConfirm</span><span class="p">(</span><span class="nx">ButtonComponent</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we have another button that only needs a confirmation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="nx">withConfirm</span><span class="p">(</span><span class="nx">SimpleButtonComponent</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We only add what we need.</p>
+
+<h3>HoC: Example</h3>
+
+<p>Let&rsquo;s build a very simple high order component. This component will add
+confirmation to anything with a click event. For simplicity sake, we will not
+have a pop up or anything like that, just a simple confirm message.</p>
+
+<p>The component will:</p>
+
+<ul>
+<li>Will wrap a component with a click event</li>
+<li>Hijack the click event and instead pop up a confirmation option when event is
+clicked</li>
+<li>If confirmed, it will run the original click event and hide the confirmation</li>
+<li>If not confirmed, it will not execute the click event and hide the
+confirmation</li>
+</ul>
+
+
+<h2>Will Wrap a component</h2>
+
+<p>This is pretty much the definition of a high order component. So let&rsquo;s do it.
+We&rsquo;ll make a skeletal outline of our HoC.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">React</span><span class="p">,</span> <span class="p">{</span> <span class="nx">Component</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">withConfirm</span><span class="p">(</span><span class="nx">WrappedComponent</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">class</span> <span class="nx">ConfirmWrapper</span> <span class="kr">extends</span> <span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kr">super</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;confirm&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>          <span class="o">&lt;</span><span class="nx">WrappedComponent</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span> <span class="o">/&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>      <span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">ConfirmWrapper</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What we are doing is simple. We are importing the usual react bits.</p>
+
+<p>Then we are exporting a function which takes a component. The function then
+creates a class which returns that component from the argument and any props
+that component might have.</p>
+
+<p>In other <a href="https://facebook.github.io/react/docs/higher-order-components.html">examples of
+HoC</a> you may
+notice they return an anonymous class. In other words, they don&rsquo;t name the class
+before returning it: <code>return class extends React.Component</code> we are not going to
+do that. Instead we are going to name the class so we can add some PropTypes.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ConfirmWrapper</span><span class="p">.</span><span class="nx">propTypes</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">handleClick</span><span class="o">:</span> <span class="nx">PropTypes</span><span class="p">.</span><span class="nx">func</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will help future developers know exactly what properties the component will
+be using (or hijacking) and what we are saving. The final product is only
+slightly different:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">React</span><span class="p">,</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">PropTypes</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;react&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kd">function</span> <span class="nx">withConfirm</span><span class="p">(</span><span class="nx">WrappedComponent</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kr">class</span> <span class="nx">ConfirmWrapper</span> <span class="kr">extends</span> <span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kr">super</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;confirm&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>          <span class="o">&lt;</span><span class="nx">WrappedComponent</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span> <span class="o">/&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>      <span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">ConfirmWrapper</span><span class="p">.</span><span class="nx">propTypes</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">handleClick</span><span class="o">:</span> <span class="nx">PropTypes</span><span class="p">.</span><span class="nx">func</span><span class="p">.</span><span class="nx">isRequired</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">ConfirmWrapper</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We now have a skeleton of a high order component. At this point, we need to
+write our first test.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-02-28T08:40:33-06:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/react/'>react</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2017/01/17/javascript-generators-a-practical-example/">
+		
+			JavaScript Generators: A Practical Example</a>
+	</h2>
+	<div class="entry-content">
+		<h2>Generators: Who Cares</h2>
+
+<p>Generators may be the most misunderstood feature of ES6.
+Personally, I&rsquo;ve read at least half a dozen articles purporting to explain them and all I can ever think is &ldquo;but why would I use them?&rdquo;</p>
+
+<p>Turns out I&rsquo;m not alone. No one uses them.</p>
+
+<p><img src="/images/generatorSurvey.png"></p>
+
+<p>However, that doesn&rsquo;t mean they don&rsquo;t matter.
+It&rsquo;s possible that soon we will love them and use them all the time.
+We just need to understand the problem they solve and see how they add value.</p>
+
+<h2>A Practical Example</h2>
+
+<p>I spend a lot of time reading code.
+And recently I decided to find someone, anyone, who used generators.</p>
+
+<p>Well, I found it!
+<a href="https://github.com/Khan">Khan Academy</a> has a few projects that use generators.
+Specifically, their project <a href="https://github.com/Khan/algebra-tool">Algebra Tool</a> uses generators in a way that makes a lot of sense.</p>
+
+<p>It&rsquo;ll take awhile to show what they are doing, but I&rsquo;ll go ahead and give the take away.
+Khan Academy, or rather the developers at Khan Academy, are using generators to turn objects and complex data structures into iterables.
+In other words, they are using generators to treat objects like arrays.</p>
+
+<p>This makes a lot of sense to me. As I&rsquo;ll show, they have a rather complex data structure, but they keep the complexity hidden behind a simple interface.
+This gives them the ability to leverage value from the data structure without requiring other parts of the program to understand the structure.</p>
+
+<p>Now a quick caveat: This is not live production production code.
+It&rsquo;s code that resulted from a day-long hack-a-thon.
+However, I wouldn&rsquo;t be surprised if something similar exists in prodution.
+And even if it doesn&rsquo;t, it easily could.
+So we&rsquo;ll dive into it as if it were highly polished and live.</p>
+
+<h2>Project Design</h2>
+
+<p>First, here&rsquo;s a look at the project.</p>
+
+<p><img src="/images/algebraTool.png"></p>
+
+<p>They are creating an online tool for students to manipulate and work with algebraic expressions.</p>
+
+<p>The expression in this calculator is built with a class called, wait for it, <code>Expression</code>.</p>
+
+<p>Here&rsquo;s a sample of the <a href="https://github.com/Khan/algebra-tool/blob/master/src/ast/expression.js">Expression Class</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">Expression</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">constructor</span><span class="p">(...</span><span class="nx">nodes</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kr">super</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="s1">&#39;Expression&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">children</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">List</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="p">...</span><span class="nx">nodes</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">toString</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">type</span><span class="p">}</span><span class="o">:</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">toString</span><span class="p">()}</span><span class="err">`</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">toJSON</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>            <span class="p">...</span><span class="kr">super</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">(),</span>
+</span><span class='line'>            <span class="nx">children</span><span class="o">:</span> <span class="p">[...</span><span class="nx">f</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">children</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">child</span> <span class="o">=&gt;</span> <span class="nx">child</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">())],</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">clone</span><span class="p">(</span><span class="nx">uniqueId</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We won&rsquo;t go through this code line-by-line.
+All we need to know is that <code>Expression</code> takes a series of nodes and creates a new instance of a <code>List</code>.</p>
+
+<h2>Data Structure</h2>
+
+<p>For simplicity, we&rsquo;ll ignore the implementation details, all we need to know is that <code>List</code> will create a data structure known as a <a href="https://code.tutsplus.com/articles/data-structures-with-javascript-singly-linked-list-and-doubly-linked-list--cms-23392">linked list</a>.</p>
+
+<p>When you create an instance of a new instance of <code>Expression</code> it will look similar to this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">e</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Expression</span><span class="p">({</span><span class="nx">id</span><span class="o">:</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="mi">3</span><span class="p">})</span>
+</span><span class='line'><span class="nx">e</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">children</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">first</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">next</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">id</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>                <span class="nx">next</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="nx">id</span><span class="o">:</span> <span class="mi">3</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">last</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">id</span><span class="o">:</span> <span class="mi">3</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The trick is that every node knows what node is after it. (It also knows the previous node, but we are leaving that out for simplicity).</p>
+
+<p>Now, this is important because a mathematical expression needs to know what symbols are surrounding it.
+For example, <code>3 • x + 5</code> makes sense and is a valid algebraic expression while <code>3 • + x 5</code> is not valid and does not make sense.</p>
+
+<p>We can seen, then, why the developers would use this data structure.
+The problem is that now they are locked into certain language constraints.
+Since they are using an object, and a deeply nested object at that, they cannot utilize certain methods that they could have on, say, an array.</p>
+
+<p>As a demonstration, let&rsquo;s return to the <code>toString</code> method on the <code>Expression</code> class.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">toString</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">type</span><span class="p">}</span><span class="o">:</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">toString</span><span class="p">()}</span><span class="err">`</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Nothing exciting here. Notice, though, that it calls the <code>children.toString</code> method.
+Since children are an instance of the <code>List</code> class, let&rsquo;s look at that method.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">List</span> <span class="kr">extends</span> <span class="nx">Node</span> <span class="p">{</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'>  <span class="nx">toString</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">let</span> <span class="nx">first</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">node</span> <span class="nx">of</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">first</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">result</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">first</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="nx">result</span> <span class="o">+=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There&rsquo;s no need to really understand what&rsquo;s going on.
+The trick is in this line: <code>for (let node of this)</code>.</p>
+
+<p>Sure. It seems normal.
+The problem is that line should not work.
+The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/for...of">for&hellip;of loop</a> does not work on objects.</p>
+
+<h2>Objects and Iterators</h2>
+
+<p>Here&rsquo;s an example of a simple <code>for ... of</code> loop:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">presentation</span> <span class="o">=</span> <span class="p">[</span>
+</span><span class='line'>  <span class="s1">&#39;ES6 Patterns in the Wild&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s1">&#39;Joe Morgan&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">metadata</span> <span class="nx">of</span> <span class="nx">presentation</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">metadata</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ES 6 Patterns in the Wild</span>
+</span><span class='line'><span class="c1">// Joe Morgan</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It&rsquo;s so simple it&rsquo;s almost not worth exploring.
+It iterates over each property in the array and logs it.</p>
+
+<p>What happens if we were to try the same loop on an object?
+Well, it won&rsquo;t work.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">presentation</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;ES6 Patterns in the Wild&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">author</span><span class="o">:</span> <span class="s1">&#39;Joe Morgan&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">metadata</span> <span class="nx">of</span> <span class="nx">presentation</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">metadata</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;</span> <span class="nx">TypeError</span><span class="o">:</span> <span class="nx">presentation</span><span class="p">[</span><span class="nx">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]</span> <span class="nx">is</span> <span class="nx">not</span> <span class="nx">a</span> <span class="kd">function</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So what is that mysterious <code>Sybmol.iterator</code>.</p>
+
+<p>Well, according to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/iterator">mdn</a>:
+<em>The Symbol.iterator well-known symbol specifies the default iterator for an object. Used by for&hellip;of.</em></p>
+
+<p>If that explains seems circular to you. Don&rsquo;t worry. It is.</p>
+
+<p>Suffice it to say, the <code>Symbol.iterator</code> tells a for loop how to work.
+It&rsquo;s defined for you on arrays (and strings and a couple other things), but not on objects.</p>
+
+<p>However, that&rsquo;s not a problem. We can define our own!
+And that&rsquo;s were generators come in.</p>
+
+<h2>Symbols and Generators</h2>
+
+<p>Ok. Now we get to the good part.</p>
+
+<p>Let&rsquo;s look at how a generator is used in Khan Academy:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">List</span> <span class="p">{</span>
+</span><span class='line'>  <span class="p">...</span>
+</span><span class='line'>    <span class="o">*</span><span class="p">[</span><span class="nx">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">let</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">first</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">while</span> <span class="p">(</span><span class="nx">node</span> <span class="o">!=</span> <span class="k">this</span><span class="p">.</span><span class="nx">last</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kd">let</span> <span class="nx">current</span> <span class="o">=</span> <span class="nx">node</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">node</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">next</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">yield</span> <span class="nx">current</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">last</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">yield</span> <span class="k">this</span><span class="p">.</span><span class="nx">last</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&rsquo;ll step through this more thoroughly in a moment.
+For now, notice that they are defining their own <code>Symbol.iterator</code> for the list.
+That&rsquo;s how they were able to loop through it at all.</p>
+
+<p>Next, notice the <code>*</code> in front of the function name and the <code>yield</code> keyword.
+That&rsquo;s a clue that this is a generator.</p>
+
+<p>Now that we&rsquo;ve established that it is, in fact, a generator, how does a generator work?
+There are essentially two ways to use a generator.</p>
+
+<p>1) We can step through it incrementally.</p>
+
+<p>2) We loop through it.</p>
+
+<p>By example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span><span class="o">*</span><span class="nx">simple</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">yield</span><span class="o">:</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">yield</span><span class="o">:</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">yield</span><span class="o">:</span> <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>1) Step through it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">y</span> <span class="o">=</span> <span class="nx">simple</span><span class="p">();</span>
+</span><span class='line'><span class="nx">y</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+</span><span class='line'><span class="c1">// { value: 1, done: false }</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">y</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+</span><span class='line'><span class="c1">// { value: 2, done: false }</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">y</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+</span><span class='line'><span class="c1">// { value: 3, done: false }</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">y</span><span class="p">.</span><span class="nx">next</span><span class="p">();</span>
+</span><span class='line'><span class="c1">// { value: undefined, done: true }</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>2) Loop through it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="k">for</span><span class="p">(</span><span class="nx">x</span> <span class="nx">of</span> <span class="nx">simple</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">// 1</span>
+</span><span class='line'><span class="c1">// 2</span>
+</span><span class='line'><span class="c1">// 3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As a bonus. Loops are used by the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator">spread operator</a>, so whenver we define something that can use a <code>for...of</code> loop we also get the spread operator as a bonus.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">z</span> <span class="o">=</span> <span class="nx">simple</span><span class="p">();</span>
+</span><span class='line'><span class="p">[...</span><span class="nx">z</span><span class="p">];</span>
+</span><span class='line'><span class="c1">// [1, 2, 3]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Pretty neat, huh?</p>
+
+<p>Back to our example.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="o">*</span><span class="p">[</span><span class="nx">Symbol</span><span class="p">.</span><span class="nx">iterator</span><span class="p">]()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">let</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">first</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">while</span> <span class="p">(</span><span class="nx">node</span> <span class="o">!=</span> <span class="k">this</span><span class="p">.</span><span class="nx">last</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">let</span> <span class="nx">current</span> <span class="o">=</span> <span class="nx">node</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">node</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">next</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">yield</span> <span class="nx">current</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">last</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">yield</span> <span class="k">this</span><span class="p">.</span><span class="nx">last</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You do not need to define every single <code>yield</code> statement, as long as there is something to yield.
+The generator will return it.</p>
+
+<p>Looking back at our original data structure:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">e</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Expression</span><span class="p">({</span><span class="nx">id</span><span class="o">:</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="mi">3</span><span class="p">})</span>
+</span><span class='line'><span class="nx">e</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">children</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">first</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">next</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">id</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>                <span class="nx">next</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="nx">id</span><span class="o">:</span> <span class="mi">3</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">last</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">id</span><span class="o">:</span> <span class="mi">3</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The generator will yield the first node and the <code>toString</code> method will grab the id.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">id</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">next</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">id</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">next</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">id</span><span class="o">:</span> <span class="mi">3</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then it will yield the next node and the <code>toString</code> method will grab the id.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">id</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">next</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">id</span><span class="o">:</span> <span class="mi">3</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, it will grab the next node which is the same as the last node.
+At this point the <code>while</code> loop is resolved.
+Finally, the last node is yielded and the generator is resolved.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nx">id</span><span class="o">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In essence, the generator turned the linked list into an array.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">e</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Expression</span><span class="p">({</span><span class="nx">id</span><span class="o">:</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="mi">3</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Kinda sorta</span>
+</span><span class='line'><span class="nx">e</span> <span class="o">=</span> <span class="p">[{</span><span class="nx">id</span><span class="o">:</span><span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="mi">2</span><span class="p">},</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="mi">3</span><span class="p">}]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>What&rsquo;s the point?</h2>
+
+<p>Now we can see how the generator worked in this example.
+But that doesn&rsquo;t resolve the question of why?</p>
+
+<p>Really, it comes down to crafting quality code.
+Khan Academy wanted to use a particular data structure, but they didn&rsquo;t want to burden the rest of the app with knowledge of the data structure.
+The generator allows them to utilize the advantages of a data structure while allowing other parts of the app to merely assume it is an array.
+They can do whatever they might want with the data:
+loop through it, spread it, and so on.</p>
+
+<p>In other words. The code is as complicated as it needs to be while be as simple as it can be.</p>
+
+<p>And isn&rsquo;t that the point of any language feature or library?
+It allows us to do the most work with the most elegance.</p>
+
+<p>As for me, I have read many articles about generators, but it wasn&rsquo;t until I dug into this example that I really could envision a use case.</p>
+
+<p>If you&rsquo;re curious, no I haven&rsquo;t used one in production.
+I wrote one at one point, but ended up taking it out because there was a simpler and clearer way to do the same thing.
+So that&rsquo;s the direction I went.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-01-17T07:51:58-06:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2017/01/12/es6-patterns-in-the-wild/">
+		
+			ES6 Patterns in the Wild</a>
+	</h2>
+	<div class="entry-content">
+		<h2>Slides from CodeMash.</h2>
+
+<p>It was a lot of fun despite the room malfunction. Thanks to all who attended.</p>
+
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/GCW4j9RMwiboZc" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/jsmapr1/es6-patterns-in-the-wild" title="Es6 patterns in the wild" target="_blank">Es6 patterns in the wild</a> </strong> from <strong><a target="_blank" href="//www.slideshare.net/jsmapr1">Joe Morgan</a></strong> </div></p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-01-12T14:11:07-06:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/11/21/testing-apis-in-angular-2/">
+		
+			Testing Apis in Angular 2 With MockBackend</a>
+	</h2>
+	<div class="entry-content">
+		<p>Ok, ok. I know Angular 2 is still fairly new, but working with it has been&hellip; an experience.
+There&rsquo;s so much information that is out of date or just plain wrong.
+And that is doubly true of testing.
+No matter how important every claims testing is to modern development, it always lags behind.</p>
+
+<p>Recent case in point, I was out interviewing for new jobs and after a few places gave me a spiel
+about how their developers are geniuses (aren&rsquo;t they always) and how their products are amazing (ditto),
+I asked what testing suite they used. They paused and said, &lsquo;well we don&rsquo;t have tests now, but we totally want
+to do it in the future.&rsquo; What?!.</p>
+
+<p>Anyway, testing in Angular still has a long way to go in terms of documentation.
+I found myself in a situation where I needed to test the results of an api call.
+The api returned some rather weird information and it needed to be formatted and translated a bit
+before I wanted to push it into the app.
+Furthermore, I knew the endpoint was going to change soon which means that there would need to be some
+refactoring so tests are an absolute necessity.</p>
+
+<p>Alright, so there&rsquo;s a need. Seems like a pretty common need.
+I&rsquo;ll just poke around the documentation a little and find what I need.</p>
+
+<p>Turns out that&rsquo;s not so easy.
+There is something call <a href="https://angular.io/docs/js/latest/api/http/testing/index/MockBackend-class.html">MockBackEnd</a>
+but it&rsquo;s marked &lsquo;experimental&rsquo; in the documentation and the documentation is confusing at that.
+I found a few <a href="https://developers.livechatinc.com/blog/testing-angular-2-apps-routeroutlet-and-http/">other blog posts</a>
+but I couldn&rsquo;t quite get them to work (more of a statement of my ability than that of the authors).</p>
+
+<p>So after some experimentation, I give you my approach.
+It pulls some methods from the other documents, but I think it is a little more simple.</p>
+
+<h2>Project Structure</h2>
+
+<p>The project is organized into components.
+I&rsquo;ll be pulling data from <a href="https://jsonplaceholder.typicode.com">jsonplaceholder</a>.
+Specifically, I&rsquo;ll be pulling <a href="https://jsonplaceholder.typicode.com/users">users data</a>.</p>
+
+<p>Our component will look like this:</p>
+
+<pre>
+/Users
+  users.component.ts
+  users.component.spec.ts
+  users.service.ts
+  users.service.spec.ts
+  users.http.service.ts
+</pre>
+
+
+<p>It&rsquo;s a pretty standard set up.
+The only difference is that I moving all the api calls to a separate http service.
+The reason here is</p>
+
+<ol>
+<li>they are in one clear place if an api endpoint changes</li>
+<li>they are a little easier to mock (if I wanted to go that route)</li>
+<li>Separation of concerns and all that stuff</li>
+</ol>
+
+
+<p>Ok. Let&rsquo;s get rolling.</p>
+
+<h2>Code</h2>
+
+<p>Here&rsquo;s a look at the code I want to test. I&rsquo;ll do the service in this post and a component in a separate post.</p>
+
+<p>First is the http service.
+This is where only the most basic REST calls are made.</p>
+
+<script src="https://gist.github.com/jsmapr1/06e24efb50e7730e06119880943bd7da.js"></script>
+
+
+<p>This is the service. It will call the http service and do any other data manipulations that I need.</p>
+
+<script src="https://gist.github.com/jsmapr1/0526408be4689e4dc84539a6aa4fcaf4.js"></script>
+
+
+<p>Finally, here is the initial test.
+This one is generated by <a href="https://github.com/angular/angular-cli">Angular CLI</a>.
+Essentially, it is injecting the service into the test suite and then later into each assertion.
+This mirrors how I would inject it into a component.</p>
+
+<script src="https://gist.github.com/jsmapr1/288258bce6099d9c9f4ded22abab310c.js"></script>
+
+
+<p>Now the question is how do I test the response of the api call?
+The first step is creating a stable set of test data.</p>
+
+<h2>Mock Data</h2>
+
+<p>Creating mock data is important for a few reasons.
+First, I need to decouple the test from an actual api call.
+That would be slow and expensive. So I need something that can return data as if it were an api.
+Thus, I need data.</p>
+
+<p>Second, I need to make sure that the same data is return every time.
+It&rsquo;s hard to write tests against a live api because the data is bound to change and will break tests.
+Having mock data avoids this issue.
+The problem, of course, is that if the api changes I will not have the benefit of failing tests, but that is a different issue.</p>
+
+<p>I try to keep all component related material together.
+I also try to keep tests clean if I can.
+As a result, I tend to create a separate file just of mock data.
+In this case, I&rsquo;ll create <code>users.data.mock.ts</code>.</p>
+
+<script src="https://gist.github.com/jsmapr1/e67bb592f562db65221624b752f43681.js"></script>
+
+
+<h2>First Test</h2>
+
+<p>Well, really it&rsquo;s more like the fourth or fifth test, but I&rsquo;ll ignore all the other ones created by angular cli.</p>
+
+<p>Our first test will be pretty simple. I just need to make sure that getUsers returns the mockdata.
+There are a couple of tricks, though.
+Since the http client <a href="https://angular.io/docs/ts/latest/guide/server-communication.html#!#fetch-data-with-http-get">returns an observable</a>
+I need to be sure to subscribe to the data before I can make an assertion.</p>
+
+<p>Here&rsquo;s how a basic test will look.</p>
+
+<script src="https://gist.github.com/jsmapr1/53fac147f309f4a812509d40dab0994f.js"></script>
+
+
+<p>It will, of course, fail. But it will not fail for good TDD reasons.</p>
+
+<p>Instead you&rsquo;ll get some ugly message that says something like this:
+<code>Error: No provider for Http!</code></p>
+
+<p>It&rsquo;s not failing because the assertions do not match. It&rsquo;s failing because not all the dependencies are injected.</p>
+
+<p>At this point, I can keep including insertions, but it&rsquo;s probably a good time to think about mocks.</p>
+
+<h2>Mock Option 1: Mock a Service</h2>
+
+<p>Before I get too far, I know. Mocks are bad. Mocks are code smells and so on.
+However, there are some good reasons to mock things and a service that would contact something outside the application is a pretty good reason.</p>
+
+<p>In that spirit, let&rsquo;s mock the <code>users.http.service</code>. There&rsquo;s only one get method, so the mock will be very short.</p>
+
+<script src="https://gist.github.com/jsmapr1/8f61ef6dffbde53be8fb855519313504.js"></script>
+
+
+<p>This seems easy enough. I create an observable and pass that along.
+Unfortunately, that will not work. The angular http client is doing a lot more than returning an observable.
+It is also returning a <a href="https://angular.io/docs/ts/latest/api/http/index/Response-class.html"><code>Response</code></a>
+object which is itself returning a <a href="https://angular.io/docs/ts/latest/api/http/index/ResponseOptions-class.html"><code>ResponseOptions</code></a> object
+which contains stringified data.</p>
+
+<p>Phew.</p>
+
+<p>So the final mock file will look like this:</p>
+
+<script src="https://gist.github.com/jsmapr1/9ffd0cb264d8cd3552219c417974970c.js"></script>
+
+
+<p>That&rsquo;s not too bad, but it&rsquo;s clear that the file will grow and grow.
+And, of course, that&rsquo;s just another file mucking up the place.</p>
+
+<p>Fortunately, there is a way around this and that is the built in MockBackend class.</p>
+
+<h2>Mock Option 2: MockBackend</h2>
+
+<p><a href="https://angular.io/docs/js/latest/api/http/testing/index/MockBackend-class.html">MockBackend</a> is essentially a built in
+class to handle all that mocking for us.
+It also prevents us from needing to make a lot of extra files.</p>
+
+<p>Here&rsquo;s the script:</p>
+
+<script src="https://gist.github.com/jsmapr1/65fbe6c69cdb12c6e1df66971b84d824.js"></script>
+
+
+<p>Notice the changes.
+I&rsquo;ve included many of the things from the previous mock in our test. There include: <code>Response</code>, <code>ResponseOptions</code>, and the <code>MockUsers</code>.
+I&rsquo;ve also included the <code>MockBackend</code> to capture the http requests and generate an observable and <code>MockConnnection</code> to capture the request and
+route it pass it the response I want.</p>
+
+<p>In the providers, instead of overriding <code>UsersHttpService</code>, I am overriding <code>Http</code>.</p>
+
+<p>Finally, in the actual test, I inject MockBackend.
+Then, I build the <code>Response</code> exactly how I did in the previous example and use <code>MockConnection</code> to capture the request.</p>
+
+<h2>Wrapping up</h2>
+
+<p>In a funny way, these built in options create more clutter.
+At the very least, it require more typing.
+The connection can be moved to a <code>beforeEach</code> and I can reuse it over and over.
+However, I think the biggest advantage is that it keeps the testing overhead in the test file.
+It prevents us from needing to create a lot of separate files.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-11-21T11:44:03-06:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/angular/'>angular</a>, <a class='category' href='/blog/categories/javascript/'>javascript'</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/09/23/react-animations/">
+		
+			React Animations</a>
+	</h2>
+	<div class="entry-content">
+		<p>Previously, I wrote about React animations for creating a <a href="/blog/2016/01/05/creating-a-dropdown-menu-in-react/">dropdown menu</a>,
+but after spending more and more time working with them, I decided to explore exactly how animations fit into the React lifecycle.</p>
+
+<h2>Two Animations</h2>
+
+<p>There are two kinds of component animations in React.</p>
+
+<ol>
+<li>The component is already in the DOM</li>
+<li>The component is entering the DOM</li>
+</ol>
+
+
+<p>The first kind are not that hard to deal with.
+In the past, I&rsquo;ve added a CSS class to trigger a transition.
+There are also React specific libraries like <a href="https://github.com/FormidableLabs/radium">radium</a>.</p>
+
+<p>The second kind of component requires a bit more work.</p>
+
+<p>To understand why, consider the React lifecycle.</p>
+
+<h2>React Lifecycle</h2>
+
+<p>In React, you create a series of components that become part of a the virtual DOM:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="s2">&quot;PotatoHead&quot;</span><span class="err">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;head&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;peg&quot;</span><span class="p">:</span> <span class="kc">null</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nt">&quot;body&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;topPeg&quot;</span><span class="p">:</span> <span class="s2">&quot;eyes&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;middlePeg&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+</span><span class='line'>        <span class="nt">&quot;bottomPeg&quot;</span><span class="p">:</span> <span class="kc">null</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nt">&quot;bottom&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nt">&quot;peg&quot;</span><span class="p">:</span> <span class="s2">&quot;shoes&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The virtual DOM renders into the DOM as seen in the browser:</p>
+
+<p><img src="/images/empty.png"></p>
+
+<p>Eventually something happens in the app and that triggers an action:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">dispatch</span><span class="p">(</span><span class="nx">existentialCrisis</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This changes the virtual DOM:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="s2">&quot;PotatoHead&quot;</span><span class="err">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;head&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;peg&quot;</span><span class="p">:</span> <span class="kc">null</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nt">&quot;body&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;topPeg&quot;</span><span class="p">:</span> <span class="s2">&quot;eyes&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;middlePeg&quot;</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+</span><span class='line'>    <span class="nt">&quot;bottomPeg&quot;</span><span class="p">:</span> <span class="s2">&quot;mouth&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nt">&quot;bottom&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nt">&quot;peg&quot;</span><span class="p">:</span> <span class="s2">&quot;shoes&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which updates the actual DOM:</p>
+
+<p><img src="/images/crisis.png"></p>
+
+<p>The thing that makes React animations difficult is that there is no point in the lifecycle that they fit in.</p>
+
+<p>Think about the lifecycle hooks:</p>
+
+<p><svg width="263px" height="69px" viewBox="250 180 263 69" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <rect id="path-1" x="250" y="180" width="263" height="69" rx="8"></rect>
+        <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="263" height="69" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+    </defs>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-2)" stroke-width="4" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+    <text id="componentWillMount" stroke="none" fill="none" font-family="Helvetica" font-size="20" font-weight="normal">
+        <tspan x="288" y="220" fill="#000000">componentWillMount</tspan>
+    </text>
+</svg><br/>
+<svg width="263px" height="69px" viewBox="250 180 263 69" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <rect id="path-1" x="250" y="180" width="263" height="69" rx="8"></rect>
+        <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="263" height="69" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+    </defs>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-2)" stroke-width="4" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+    <text id="render" stroke="none" fill="none" font-family="Helvetica" font-size="20" font-weight="normal">
+        <tspan x="353" y="220" fill="#000000">render</tspan>
+    </text>
+</svg><br/>
+<svg width="263px" height="69px" viewBox="250 180 263 69" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <rect id="path-1" x="250" y="180" width="263" height="69" rx="8"></rect>
+        <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="263" height="69" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+    </defs>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-2)" stroke-width="4" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+    <text id="componentDidMount" stroke="none" fill="none" font-family="Helvetica" font-size="20" font-weight="normal">
+        <tspan x="289" y="220" fill="#000000">componentDidMount</tspan>
+    </text>
+</svg></p>
+
+<p>Where are animations supposed to fit in?</p>
+
+<p>You can&rsquo;t use the <code>componentWillMount</code> hook because there is no DOM element to animate.</p>
+
+<p><img src="/images/willMount.png"></p>
+
+<p>And you can&rsquo;t use the <code>componentDidMount</code> hook because the element is already there, so you would have to rerender it (causing a potential loop)
+and you may see a jump as the component gets an orientation change after being added to the DOM.</p>
+
+<p><img src="/images/didMount.png"></p>
+
+<h2>Solution: More Lifecycle Hooks</h2>
+
+<p>The React team recognized this problem and created a higher level component called <em>ReactTransitionGroups</em> that can wrap
+additional components giving them more lifecycle hooks.</p>
+
+<p><svg width="263px" height="246px" viewBox="250 180 263 246" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <rect id="path-1" x="250" y="180" width="263" height="69" rx="8"></rect>
+        <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="263" height="69" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <rect id="path-3" x="250" y="269" width="263" height="69" rx="8"></rect>
+        <mask id="mask-4" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="263" height="69" fill="white">
+            <use xlink:href="#path-3"></use>
+        </mask>
+        <rect id="path-5" x="250" y="357" width="263" height="69" rx="8"></rect>
+        <mask id="mask-6" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="263" height="69" fill="white">
+            <use xlink:href="#path-5"></use>
+        </mask>
+    </defs>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-2)" stroke-width="4" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-4)" stroke-width="4" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-3"></use>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-6)" stroke-width="4" fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-5"></use>
+    <text id="componentWillMount" stroke="none" fill="none" font-family="Helvetica" font-size="20" font-weight="normal">
+        <tspan x="288" y="220" fill="#000000">componentWillMount</tspan>
+    </text>
+    <text id="render" stroke="none" fill="none" font-family="Helvetica" font-size="20" font-weight="normal">
+        <tspan x="353" y="311" fill="#000000">render</tspan>
+    </text>
+    <text id="componentDidMount" stroke="none" fill="none" font-family="Helvetica" font-size="20" font-weight="normal">
+        <tspan x="289" y="399" fill="#000000">componentDidMount</tspan>
+    </text>
+</svg></p>
+
+<p>Any component that is wrapped within a <em>ReactTransitionGroup</em> component will get a couple new lifecycle hooks.
+One of the most relevant is <code>componentWillEnter</code> which will be fired as soon as the component is mounted (the same time as componentDidMount).</p>
+
+<p><svg width="351px" height="334px" viewBox="141 61 351 334" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <rect id="path-10" x="141" y="141" width="170" height="52" rx="6"></rect>
+        <mask id="mask-20" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="170" height="52" fill="white">
+            <use xlink:href="#path-10"></use>
+        </mask>
+        <rect id="path-30" x="141" y="61" width="226" height="69" rx="8"></rect>
+        <mask id="mask-40" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="226" height="69" fill="white">
+            <use xlink:href="#path-30"></use>
+        </mask>
+        <path d="M141,333.999471 C141,329.581485 144.582815,326 149.001933,326 L295.121094,326 L358.998463,326 C363.41759,326 367,329.588481 367,333.999471 L367,387.000529 C367,391.418515 363.427298,395 359.006351,395 L148.993649,395 C144.578879,395 141,391.411519 141,387.000529 L141,333.999471 Z" id="path-50"></path>
+        <mask id="mask-60" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="226" height="69" fill="white">
+            <use xlink:href="#path-50"></use>
+        </mask>
+        <rect id="path-70" x="141" y="203" width="170" height="52" rx="6"></rect>
+        <mask id="mask-80" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="170" height="52" fill="white">
+            <use xlink:href="#path-70"></use>
+        </mask>
+        <rect id="path-90" x="141" y="264" width="170" height="52" rx="6"></rect>
+        <mask id="mask-100" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="170" height="52" fill="white">
+            <use xlink:href="#path-90"></use>
+        </mask>
+        <rect id="path-101" x="322" y="264" width="170" height="52" rx="6"></rect>
+        <mask id="mask-102" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="170" height="52" fill="white">
+            <use xlink:href="#path-101"></use>
+        </mask>
+    </defs>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-20)" stroke-width="3" fill="none" xlink:href="#path-10"></use>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-40)" stroke-width="4" fill="none" xlink:href="#path-30"></use>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-60)" stroke-width="4" fill="none" xlink:href="#path-50"></use>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-80)" stroke-width="3" fill="none" xlink:href="#path-70"></use>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-100)" stroke-width="3" fill="none" xlink:href="#path-90"></use>
+    <text id="ReactTransitionGroup" stroke="none" fill="none" font-family="Helvetica" font-size="20" font-weight="normal">
+        <tspan x="156" y="103" fill="#000000">ReactTransitionGroup</tspan>
+    </text>
+    <text id="ReactTransitionGroup" stroke="none" fill="none" font-family="Helvetica" font-size="20" font-weight="normal">
+        <tspan x="156" y="368" fill="#000000">ReactTransitionGroup</tspan>
+    </text>
+    <text id="componentWillMount" stroke="none" fill="none" font-family="Helvetica" font-size="14" font-weight="normal">
+        <tspan x="161" y="173" fill="#000000">componentWillMount</tspan>
+    </text>
+    <text id="componentDidMount" stroke="none" fill="none" font-family="Helvetica" font-size="14" font-weight="normal">
+        <tspan x="161" y="296" fill="#000000">componentDidMount</tspan>
+    </text>
+    <use id="Rectangle" stroke="#000000" mask="url(#mask-102)" stroke-width="3" fill="none" xlink:href="#path-101"></use>
+    <text id="componentWillEnter" stroke="none" fill="none" font-family="Helvetica" font-size="14" font-weight="normal">
+        <tspan x="342" y="296" fill="#000000">componentWillEnter</tspan>
+    </text>
+    <text id="render" stroke="none" fill="none" font-family="Helvetica" font-size="14" font-weight="normal">
+        <tspan x="206" y="235" fill="#000000">render</tspan>
+    </text>
+</svg></p>
+
+<p><code>componentWillEnter</code> creates a lifecycle hook that we can use to animate an components we want.
+All other animations will be blocked until a callback is called.</p>
+
+<p>Chang Wang has an excellent example of how to build an animation with Tween using <a href="https://medium.com/@cheapsteak/animations-with-reacttransitiongroup-4972ad7da286#.6r1fat121">ReactTransitionGroups</a>.
+If you need fine grained control or want to use a specific library, than <code>ReactTransitionGroups</code> are the way to go.</p>
+
+<p>If you need something even easier, React made a further abstraction called <code>ReactCSSTransitionGroups</code> that <a href="https://github.com/facebook/react/blob/master/src/addons/transitions/ReactCSSTransitionGroupChild.js">utilize transition</a> groups but allow the developer to use CSS transitions to handle any animations.</p>
+
+<h2>ReactCSSTransitionGroups</h2>
+
+<p><code>ReactCSSTransitionGroups</code> work by wrapping components and then adding specific classes to child components for a designated amount of time.</p>
+
+<p>Here&rsquo;s an example of how you would set it up:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">const</span> <span class="nx">ShapeContainer</span> <span class="o">=</span> <span class="p">({</span><span class="nx">elements</span><span class="p">})</span> <span class="o">=&gt;</span> <span class="p">(</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span> <span class="o">=</span> <span class="s2">&quot;shapes&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="o">&lt;</span><span class="nx">ReactCSSTransitionGroup</span>
+</span><span class='line'>      <span class="nx">transitionName</span> <span class="o">=</span> <span class="s2">&quot;shape&quot;</span>
+</span><span class='line'>      <span class="nx">transitionEnterTimeout</span><span class="o">=</span><span class="p">{</span><span class="mi">2000</span><span class="p">}</span>
+</span><span class='line'>      <span class="nx">transitionLeaveTimeout</span><span class="o">=</span><span class="p">{</span><span class="mi">2000</span><span class="p">}</span>
+</span><span class='line'>     <span class="o">&gt;</span>
+</span><span class='line'>      <span class="p">{</span><span class="nx">elements</span><span class="p">}</span>
+</span><span class='line'>    <span class="o">&lt;</span><span class="err">/ReactCSSTransitionGroup&gt;</span>
+</span><span class='line'>  <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice a few things.
+I gave the transition name of shape and a transition enter timeout of 2000 milliseconds and the same for the transition leave.</p>
+
+<p>This means that a few classes with the base name <em>shape</em> will be added to every child component for 2 seconds before they are automatically removed.</p>
+
+<p>To take advantage of any transitions, we need to define them with CSS:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.shape-enter</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">transform</span><span class="o">:</span> <span class="n">scale</span><span class="p">(</span><span class="m">0</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.shape-enter.shape-enter-active</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">transform</span><span class="o">:</span> <span class="n">scale</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">transition</span><span class="o">:</span> <span class="n">all</span> <span class="m">2s</span> <span class="n">ease</span><span class="o">-</span><span class="n">in</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Rendered code will look like this.
+The <code>span</code> tag is the <code>ReactCSSTransitionGroup</code> (although you can specify other tags like <code>div</code> or <code>ul</code>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;shapes&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;span</span> <span class="na">data-reactid=</span><span class="s">&quot;0.1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Any child componenent that is added will receive that <code>shape-enter</code> class.
+This sets up the initial styling that will be animated (in this example it is effectively hidden).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;shapes&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;span</span> <span class="na">data-reactid=</span><span class="s">&quot;0.1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;svg</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span>
+</span><span class='line'>           <span class="na">class=</span><span class="s">&quot;shape-enter&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;circle</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span><span class="nt">&gt;&lt;/circle&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/svg&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the next tick, the component will receive the <code>shape-enter-active</code> class which will trigger the CSS transition.
+In this example, it will scale it up to full size.
+The timing for the transition should match the timeout on CSS transition group.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;shapes&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;span</span> <span class="na">data-reactid=</span><span class="s">&quot;0.1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;svg</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span>
+</span><span class='line'>           <span class="na">class=</span><span class="s">&quot;shape-enter shape-enter-active&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;circle</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span><span class="nt">&gt;&lt;/circle&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/svg&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After the timeout is reached, the classes are removed from the component.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;shapes&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;span</span> <span class="na">data-reactid=</span><span class="s">&quot;0.1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;svg</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span>
+</span><span class='line'>           <span class="na">class=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;circle</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span><span class="nt">&gt;&lt;/circle&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/svg&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Any subsequent children will go through the same process.</p>
+
+<p>Animating a component leaving is even more important.
+Without transition groups, a component will disappear before anything can happen to it.
+However, with <code>ReactCSSTransitionGroups</code> the whole process happens in reverse.</p>
+
+<p>Let&rsquo;s start with the leaving css.
+We&rsquo;ll start at full size and shrink to nothing.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.shape-leave</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">transform</span><span class="o">:</span> <span class="n">scale</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.shape-leave.shape-leave-active</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">transform</span><span class="o">:</span> <span class="n">scale</span><span class="p">(</span><span class="m">0</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">transition</span><span class="o">:</span> <span class="n">all</span> <span class="m">2s</span> <span class="n">ease</span><span class="o">-</span><span class="n">in</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A component in the DOM will first receive the <code>shape-leave</code> class:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;shapes&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;span</span> <span class="na">data-reactid=</span><span class="s">&quot;0.1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;svg</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span>
+</span><span class='line'>           <span class="na">class=</span><span class="s">&quot;shape-leave&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;circle</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span><span class="nt">&gt;&lt;/circle&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/svg&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that, it will receive the <code>shape-leave-active</code> class:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;shapes&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;span</span> <span class="na">data-reactid=</span><span class="s">&quot;0.1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;svg</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span>
+</span><span class='line'>           <span class="na">class=</span><span class="s">&quot;shape-leave shape-leave-active&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;circle</span> <span class="na">data-reactid=</span><span class="s">&quot;.0.2&quot;</span><span class="nt">&gt;&lt;/circle&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/svg&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And when the timeout set on the <code>ReactCSSTransitionGroup</code> component is reached, the element is removed.
+Note: The element is not removed after the animation is complete, but when the timeout is reached.
+So if the CSS transition is longer than the timeout it will just disappear.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;shapes&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;span</span> <span class="na">data-reactid=</span><span class="s">&quot;0.1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And that&rsquo;s all it takes.</p>
+
+<p>Here&rsquo;s a full demo you can try:</p>
+
+<p data-height="450" data-theme-id="0" data-slug-hash="KgdNWy" data-default-tab="js,result" data-user="jsmapr1" data-embed-version="2" class="codepen">See the Pen <a href="http://codepen.io/jsmapr1/pen/KgdNWy/">ReactCSSTransitionGroup</a> by Joe Morgan (<a href="http://codepen.io/jsmapr1">@jsmapr1</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+
+
+<script async src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-09-23T08:15:14-05:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/react/'>react</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/08/26/building-an-npm-package-part-4/">
+		
+			Building an Npm Package Part 4: Publishing</a>
+	</h2>
+	<div class="entry-content">
+		<p>Well, all the hard work is done it&rsquo;s time to deploy.</p>
+
+<p>Fortunately, this is one of the easiest parts of npm.
+Deploying is a <a href="https://docs.npmjs.com/getting-started/publishing-npm-packages">simple process</a>, so I will limit myself
+to summarizing.</p>
+
+<h2>Have An Account</h2>
+
+<p>Head over to <a href="https://www.npmjs.com/signup">npm</a> and establish a user.</p>
+
+<p>Connect the project to your account with <code>npm login</code>;</p>
+
+<p>Piece of cake. Nothing else to see here.</p>
+
+<h2>Update .npmignore</h2>
+
+<p>This file is for anything you want to ignore when the file is published.</p>
+
+<p>Recall from the discussion on <a href="/blog/2016/07/27/building-an-npm-package-part-2-package-dot-json/">package.json</a> that you
+should have a script called <code>prepublish</code> that will do any fancy compiling that needs to be done.</p>
+
+<p>Now that we are compiling all the things down, there is no need to include the uncompiled files.
+Test files too do not need to be included.
+These all add extra weight to your package.</p>
+
+<p>So add those to your .npmignore.
+Here&rsquo;s a simple one:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>test/
+</span><span class='line'>src/
+</span><span class='line'>.babelrc</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Remember npm handles all the dependencies, so ignore node_modules either here or (preferably) in your .gitignore file.</p>
+
+<h2>Publishing and Updating</h2>
+
+<p>Now all you have to do is run <code>npm publish</code> and your package is live.</p>
+
+<p>Congratulations!</p>
+
+<p>If you&rsquo;re anything like me, you&rsquo;ll immediately notice some mistakes.
+So, you&rsquo;ll need to be able to update and version.</p>
+
+<p>Make whatever changes you want. The update the version with <code>npm version</code> e.g. <code>npm version 1.0.1</code>.
+This will change the package.json version number and add a tag to your git repo.</p>
+
+<p>Now all you have to do is run <code>npm publish</code> again and everything is up to date.
+Very easy.</p>
+
+<h2>All Done</h2>
+
+<p>Now go forth and make many more commits.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-26T15:23:21-05:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/npm/'>npm</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/08/22/craftsmanship/">
+		
+			Craftsmanship</a>
+	</h2>
+	<div class="entry-content">
+		<p>About 6 months into my first full-time coding job I was called into my boss&rsquo;s office.
+I had been working on a project that was at least a month overdue.
+I exhausted and suffering constant <a href="https://en.wikipedia.org/wiki/Impostor_syndrome">impostor syndrome</a>.
+Despite all that, the project was ready to ship and I was happy and feeling like maybe I could do this.</p>
+
+<p>That feeling slipped away very quickly.
+My boss was sitting with the engineering director and they had a bunch of my code open on the screen.
+Despite all that he was in a good mood and invited me to sit down.</p>
+
+<p>&ldquo;Feel pretty good to be finished?&rdquo; he asked.</p>
+
+<p>I nodded.
+&ldquo;We were looking through the commits&rdquo; he continued.
+&ldquo;And it looks like you have a little more to do.&rdquo;</p>
+
+<p>I&rsquo;m sure my face dropped at that point.
+I was worn out and ready to move on.</p>
+
+<p>&ldquo;Have you looked at the style guide?&rdquo;</p>
+
+<p>Again I nodded.</p>
+
+<p>&ldquo;Well, most of your code is not meeting the style requirements.&rdquo;</p>
+
+<p>He clicked to the first section. &ldquo;This is indented out for no reason. This variable name doesn&rsquo;t make any sense.&rdquo;
+As he continued he clicked through more code.
+&ldquo;You name this function and then never use it. There&rsquo;s supposed to be space between these parentheses.&rdquo;</p>
+
+<p>After a few minutes he stopped.
+&ldquo;I know you are ready to be finished, but you need to go back and get it right.
+We all know parts of the code base are better or worse than others, but everything you touch should be better than it was before.&rdquo;</p>
+
+<p>He paused and finished by saying, &ldquo;It&rsquo;s about craftsmanship.&rdquo;</p>
+
+<p>That was probably the best coding advice I ever got.</p>
+
+<h2>Coding is more than control statements and loops</h2>
+
+<p>For many beginners, the biggest struggle is getting things to work.
+I would go further, that struggle never goes away.</p>
+
+<p>Nearly everything is prototyped in some form.
+Either, I sketch something out in the code itself, or I try an idea in a REPL, or, if I&rsquo;m being very good, I write a test and then go from there.
+However, mature coders will go back and rework that prototype until it is something coherent and beautiful.
+One of the best parts of testing code is that once it is passing you can change it as much as you want and you know whether that getting things to work part is still taken care of.</p>
+
+<p>Probably the most unfortunate part of coding is that poorly crafted code that works, works.</p>
+
+<p>If a carpenter does a poor job of crafting a piece of furniture, that furniture will not work.
+The joints will snap.
+The hanging nails will cut someone sitting down.
+The upholstery will come apart.
+It won&rsquo;t work.</p>
+
+<p>Bad code that works will still work.
+As a result, it takes a step of maturity to reach a level of craftsmanship, to make things that are beautiful.</p>
+
+<p>Now I know that bad code has technical debt and in a sense does not work in that it will be harder to extend or have a difficult time handling change, but that&rsquo;s not always the case.
+Bad code can run for years.</p>
+
+<p>The reason this is a problem is that becoming a craftsman is hard work. Very hard work.
+It&rsquo;s way harder than learning to make working things, because there are no cues when things are wrong.
+It&rsquo;s an intuition, an aesthetic.</p>
+
+<p>Linters can help, but they can only handle very small clear rules.
+They cannot account for taste.
+They cannot say a function could be simpler or that a class is poorly constructed.</p>
+
+<h2>Building an Intuition</h2>
+
+<p>They key to being a craftsman, then, is building that intuition.
+Unfortunately, I don&rsquo;t hear many people talking about how to do that.
+Traditionally, coders become masters of their craft in the same way it&rsquo;s been done for generations.
+They work with other masters of their craft that give continual feedback and push them to higher standards.</p>
+
+<p>Another way is to read.</p>
+
+<p>We live in a time where lots of wonderful code is open source.
+And just as a novelist would spend time studying the works of other novelists, we do not spend nearly enough time reading code by other people.</p>
+
+<p>At this point, I have a budding intuition.
+When I write some code I may get a feeling like it could be better.
+I can&rsquo;t say why or how, but I just know something is off.</p>
+
+<p>When I get that feeling that something is not quite right, I first try to find something similar.
+Usually this involves some Stack Overflow, but that&rsquo;s not a perfect solution.
+Instead, I like to browse through some open source code by people (or projects) I feel are great.
+Even if I do not find an exact solution, I get a slightly different sense of style and often that is enough to spark an idea.</p>
+
+<p><a href="https://twitter.com/dan_abramov">Dan Abramov</a> is a great one for me.
+React and Babel source code are good too.
+Sometimes I do a search in NPM for something that might be similar and then I browse a few of those projects.</p>
+
+<p>Browsing these projects may not solve the specific problem, but high quality code will give you ideas of how to craft a solution.
+Stack Overflow gives you a set of tools and construction materials, but open source code gives you a plan.
+It&rsquo;s like seeing an architect&rsquo;s blue print.</p>
+
+<p>And that is the best part.</p>
+
+<p>All of this helps the intuition grow because I see more and more code with more and more ideas and I start to learn what good code looks like, so when I do write something that can be much better, it practically had a warning sign attached.</p>
+
+<h2>Continual Improvement</h2>
+
+<p>Here are recommendations.</p>
+
+<p>Look at everything you write a second time. The first time you are too consumed with function that you miss aesthetics.</p>
+
+<p>Read more. If you find something that you like (a blog post, an NPM package, a tutorial), look up the code for the author.
+Nearly everyone has something on github.
+It will give you an better perspective on what&rsquo;s possible.
+But be more strategic in what you read.
+Articles and tutorials are fine, but they are by nature tightly controlled.
+There&rsquo;s a lot more insight in projects that grow and evolve in complexity.</p>
+
+<p>Write aesthetically pleasing code.
+If you can look at a page and it seems simple and clean and neat, you will feel the need to keep that high quality level.
+If you see code that looks ugly, take some time to refactor.
+It&rsquo;s amazing how many bugs are prevented by keeping things neat.</p>
+
+<p>Write code that makes you feel good.
+I&rsquo;ll admit sometimes I use a slightly complex one-liner when an more verbose loop would do, but those just don&rsquo;t feel the same.
+And when I write something that I enjoy seeing it makes my day better.
+If it&rsquo;s too ridiculous, call me out during a code review.
+For now, I want to write code that makes me smile.</p>
+
+<h2>Craftsmanship and Life</h2>
+
+<p>Writing well crafted code won&rsquo;t necessarily make you a genius.
+I would argue though that it will help you enjoy the process a lot more.
+And anyone who reads your code will see the extra care.</p>
+
+<p>A good craftsman brings their high standards to all projects big and small.</p>
+
+<p>Take a look at <a href="https://en.wikipedia.org/wiki/Shaker_furniture">a piece of shaker furniture</a>.
+It&rsquo;s not a skyscraper.
+It wasn&rsquo;t built to be in a museum (although some ended up there).
+It was created to serve a purpose.
+But the woodworkers didn&rsquo;t care.
+They only wanted to make the best piece of furniture they could.
+And their commitment is evident.</p>
+
+<p>Code should be no different.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-22T14:08:58-05:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/craftsmanship/'>craftsmanship</a>, <a class='category' href='/blog/categories/ideas/'>ideas</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/08/18/building-an-npm-package-part-3-testing-locally/">
+		
+			Building an NPM Package Part 3: Testing Locally</a>
+	</h2>
+	<div class="entry-content">
+		<h2>Testing Locally</h2>
+
+<p>You have, of course been writing tests the whole time, right?
+Of course, well even so you need to test it out in another application.</p>
+
+<p>Fortunately, it&rsquo;s very simple using <a href="https://docs.npmjs.com/cli/link">npm link</a>.</p>
+
+<p>First, in your the project directory, run <code>npm link</code> this will create a global symlink.</p>
+
+<p>Then in your test project, run <code>npm link [package name]</code>.</p>
+
+<p>In my case, <code>npm link frontend-gitlab</code>.</p>
+
+<p>You can combine these into one step by going to the test project and using a relative path: <code>npm link ../frontend-gitlab</code>.</p>
+
+<p>The only trick, is that if you need to remember to run the build script every time you make a change because your test project will be looking for those files as if it was being built when added from npm.
+That sounds simple, but I kept confusing myself by making a change, but not seeing it reflected in the test project.</p>
+
+<p>That&rsquo;s it. This was simple, but then that&rsquo;s what&rsquo;s great about npm.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-08-18T10:09:11-05:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascrip/'>javascrip</a>, <a class='category' href='/blog/categories/npm/'>npm</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/07/27/building-an-npm-package-part-2-package-dot-json/">
+		
+			Building an NPM Package Part 2: Package.json</a>
+	</h2>
+	<div class="entry-content">
+		<p>Anytime I begin to look deeply into an open source project should begin at the package file.
+The reason I do this is because it gives a starting point for nearly everything and I can easily get a lot of clues about the project from these points.</p>
+
+<p>Most modern web projects have something like a package file.
+Some languages make this easier than others; the package.json file or composer.json file have scripts and dependencies along with other goodies.
+Other projects split them out a bit; Ruby has a gemfile, but also a rakefile with various scripts.</p>
+
+<p>Nonetheless, it is a good starting point no matter the language.
+And fortunately for us, npm is one of the best, I would say the best, out there.
+It&rsquo;s a nice time to be a javascript developer.</p>
+
+<h1>Package.json</h1>
+
+<p>With that in mind, let&rsquo;s dive in.
+I&rsquo;m not going to go into detail about every single field.
+The <a href="https://docs.npmjs.com/files/package.json">documentation</a> is actually very good, so there&rsquo;s no reason to duplicate effort.
+Instead, I will point out a few particulars that I enjoy using and enjoy seeing others use.</p>
+
+<h1>main</h1>
+
+<p>This is the primary entry point for your script.</p>
+
+<p>When a user types:<code>require('your-package')</code> or <code>import yourPackage from your-package</code> the main file is what that import will refernce.</p>
+
+<p>As <a href="/blog/2016/05/31/building-an-npm-package-part-1/">mentioned previously</a> this is something to consider if you want a single entry point or multiple entry points.</p>
+
+<p>There can be only one main file, but the rest of the structure of the project will determine how other pieces can be imported.
+For example, if you have other chunks of code in the <strong>cool</strong> directory, than a user can import by referencing that directory (e.g. <code>import {coolaid} from 'cool-package/cool/superCool'</code>).
+More on this later.</p>
+
+<p>For most projects this will be something like <code>main.js</code> or <code>index.js</code>.</p>
+
+<h1>bin</h1>
+
+<p>I haven&rsquo;t used this on any projects, but this is how you specify a project that should be placed in the PATH.
+In other words, this is how you create a command line utility (think mocha or babel or, well, anything you run from the command line).</p>
+
+<p>The syntax is simple. For a command line that is the same as the package name, it is simply: <code>bin: './path/to/executable'</code>.
+You can also specify a name in an object:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;my&quot;</span><span class="o">:</span> <span class="s2">&quot;./path/to/my-package&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Again, as an example, here is the bin for mocha</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;_mocha&quot;</span><span class="o">:</span> <span class="s2">&quot;./bin/_mocha&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;mocha&quot;</span><span class="o">:</span> <span class="s2">&quot;./bin/mocha&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you are curious, if you want to install a file with a command line interface that is installed only in a project,
+you just have to specify the path to the node_modules bin e.g. <code>node_modules/.bin/mocha</code>.</p>
+
+<p>You can also reference the module in a npm script and the correct path will be inferred.</p>
+
+<p>Speaking of scripts&hellip;</p>
+
+<h1>script</h1>
+
+<p>This is by far my favorite part of npm (other than packaging dependencies).</p>
+
+<p>I&rsquo;ve signed on to the <a href="https://medium.freecodecamp.com/why-i-left-gulp-and-grunt-for-npm-scripts-3d6853dd22b8#.fhl757bda">recent trend</a> of using <a href="http://blog.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/">npm scripts in lieu of gulp or grunt or any of those things</a>.</p>
+
+<p>Why? There are two reasons. The first is that it is much easier to play around with scripts at the command line.
+That is, it&rsquo;s much easier to experiment with different flags and options from the command line and then, once it is working correctly, I just shove it into an npm script.</p>
+
+<p>Secondly, as I mentioned at the beginning, a package.json file is a great place to get an idea of what a project does and seeing the scripts is a big part of that.</p>
+
+<p>Here&rsquo;s one that I particularly like from <a href="">redux-thunk</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;clean&quot;</span><span class="o">:</span> <span class="s2">&quot;rimraf lib dist es&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build&quot;</span><span class="o">:</span> <span class="s2">&quot;npm run build:commonjs &amp;&amp; npm run build:umd &amp;&amp; npm run build:umd:min &amp;&amp; npm run build:es&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;prepublish&quot;</span><span class="o">:</span> <span class="s2">&quot;npm run clean &amp;&amp; npm run test &amp;&amp; npm run build&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;posttest&quot;</span><span class="o">:</span> <span class="s2">&quot;npm run lint&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;lint&quot;</span><span class="o">:</span> <span class="s2">&quot;eslint src test&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;test&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=commonjs mocha --compilers js:babel-core/register --reporter spec test/*.js&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build:commonjs&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=commonjs babel src --out-dir lib&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build:es&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=es babel src --out-dir es&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build:umd&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=commonjs NODE_ENV=development webpack&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;build:umd:min&quot;</span><span class="o">:</span> <span class="s2">&quot;cross-env BABEL_ENV=commonjs NODE_ENV=production webpack&quot;</span>
+</span><span class='line'><span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I like this because I can see exactly how a high-quality package is built and maintained.
+I can see which testing suite is used. The location of the tests (in this case it would have been obvious, but still).
+I can see how the build is implemented and so on.</p>
+
+<p>Finally, as a potential contributor, it&rsquo;s fairly obvious what I need to do to make sure that the integrity of the project is maintained.
+I don&rsquo;t need to worry about having gulp globally installed or mocha. It&rsquo;s all packaged and referenced.
+I just need to run <code>npm test</code> to test and <code>npm run lint</code> to lint.
+Super easy.</p>
+
+<p>Ok, enough gushing.
+There is a <a href="https://docs.npmjs.com/misc/scripts">a lot you can do with scripts</a>, but here are some of the best use cases:</p>
+
+<ul>
+<li><strong>test</strong>: Always have tests. This is a reserved script, so you can run it by simply typing <code>npm test</code></li>
+<li><strong>lint</strong>: Always lint your code. This is not reserved, so you must run <code>npm run lint</code></li>
+<li><strong>start</strong>: This is another reserved script, add in whatever you need to get a server up and running. If you have a server.js file, you do not need to write the script, but I think you should so it will be clear to future users.</li>
+<li><strong>prepublish</strong>: This is a script that will run when you publish your project. This matters because you do not need to check in transpiled code.
+For example. This script <code>"prepublish": "npm run build"</code> will run the build script <code>"build": "babel src -d ./"</code> which will compile the es6 code into the root directory.
+I also could have it compile to a build directory <code>"build": "babel src -d ./build",</code>, but that would make importing from non-main files a little less intuitive.</li>
+<li><strong>anything</strong>: I have a rule that if I type something more than once a day (in regards to a package) it should go in a script since future users will likely need to do it too. For example, I had a recent project that I would deploy to production.
+Since I&rsquo;m not planning on publishing this as an npm package, I just added a deploy script, so <code>npm run deploy</code> would update the server. Sure, it&rsquo;s not a full one CI build (i.e. if tests are breaking, it would still deploy), but it worked in my situation.</li>
+</ul>
+
+
+<p>Learn to love scripts. Your life will be better.</p>
+
+<h1>All the other things</h1>
+
+<p>There&rsquo;s lots, lots, lots more, but those are better explored on a case-by-case basis.
+However, there are best practices, so if you are planning on publishing, be sure to add:</p>
+
+<ul>
+<li><strong>name</strong>: Obviously.</li>
+<li><strong>descript</strong>: Obviously.</li>
+<li><strong>keywords</strong>: Make it easier to be discovered</li>
+<li><strong>bugs</strong>: Location for issues (usually on github/project/issues)</li>
+<li><strong>license</strong>: Part of <code>npm init</code> so it&rsquo;s easy to remember. Lots of options, though.</li>
+<li><strong>version</strong>: I prefere Major.Minor.Patch. Change the first number on breaking changes or major new features. The second on new features, but no breaks. And the third for, well, patches to existing features.</li>
+</ul>
+
+
+<p>Again, the documentation is great, so peruse it occasionally or before you publish to make sure you have everything.</p>
+
+<h1>Putting it together: Making multiple entry points</h1>
+
+<p>To return to a goal from the <a href="/blog/2016/05/31/building-an-npm-package-part-1/">planning stage</a>, how can we use our package.json file to create an npm package with multiple entry points?</p>
+
+<p>It&rsquo;s actually fairly simple. The trick is to understand that there will need to be a little structure, but it can be simple and clear.</p>
+
+<p>Let&rsquo;s start with a file structure such as this:</p>
+
+<pre>
+-- src/
+    -- index.js
+    -- components/
+        -- cool.js
+        -- awesome.js
+</pre>
+
+
+<p>In our package.json file set <strong>main</strong> to be index.js.
+Then in the build script, set the output to the root of the project.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="s2">&quot;main&quot;</span><span class="o">:</span> <span class="s2">&quot;index.js&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;scripts&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;build&quot;</span><span class="o">:</span> <span class="s2">&quot;babel src -d ./&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;prepublish&quot;</span><span class="o">:</span> <span class="s2">&quot;npm run build&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&rsquo;s all there is to it.
+Now when a user can import the default along with other components not in the main file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">yourPackage</span> <span class="nx">from</span> <span class="s1">&#39;your-package&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">cool</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;your-package/components/cool&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can, of course, link everything from your main file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">//inside index.js</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">cool</span><span class="p">,</span> <span class="nx">rad</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/cool&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="kr">import</span> <span class="p">{</span><span class="nx">awesome</span><span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;./components/awesome&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">export</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">cool</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">rad</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">awesome</span><span class="p">,</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But that has the downside of growing out of control rather quickly.
+Personally, I like have nested, separate functions, but it&rsquo;s a choice every author must make.</p>
+
+<p>So there you have it.
+The <em>package.json</em> file is great and there&rsquo;s tons that you can do with it.
+I know I just barely scratched the surface.
+As a recommendation, when ever you have some time to kill, look up your favorite npm package on github and take a few minutes to explore the package.json file and the project structure.
+It will give you many sources for ideas on your own projects.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-07-27T08:16:05-05:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/npm/'>npm</a>
+
+</div>
+
+
+	
+</div></article>
+
+
+    <article class="post">
+	<h2 class="title">
+		
+		<a href="/blog/2016/07/05/using-sinon-to-test-document-functions/">
+		
+			Using Sinon to Test Document Functions</a>
+	</h2>
+	<div class="entry-content">
+		<h2>That Sweet, Sweet Code Coverage</h2>
+
+<p>On my most recent React project, I&rsquo;ve really been trying to get that 100% code coverage.
+It hasn&rsquo;t been bad for the most part, but I hit a wall when a few functions needed to query the DOM.</p>
+
+<p>For the most part, I isolated the DOM as much as possible and as a result most functions were very easy to test.
+Still, I got to the point that the functionality required knowing exactly where elements were on the page.</p>
+
+<p>Here&rsquo;s an example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">export</span> <span class="kr">class</span> <span class="nx">Details</span> <span class="kr">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">scrollIntoView</span><span class="p">(</span><span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.details&#39;</span><span class="p">).</span><span class="nx">scrollIntoView</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="kr">const</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="nx">info</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">isElementInViewport</span><span class="p">(</span><span class="nx">el</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">el</span><span class="p">.</span><span class="nx">scrollIntoView</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">isElementInViewport</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">const</span> <span class="nx">rect</span> <span class="o">=</span> <span class="nx">el</span><span class="p">.</span><span class="nx">getBoundingClientRect</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">top</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">bottom</span> <span class="o">&lt;=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here&rsquo;s the background. There is a large list of events.
+When an event is clicked, a sidebar slides out with information.
+Usually when you click on the event, it is visible, right?</p>
+
+<p>Well, since I&rsquo;m using react-router, whenever the event details are visible, there is a route to that state.
+A user can copy the url, there is a case where the sidebar is open, but the event that is related to it is off page which is confusing to visitors.
+The fix is easy, if the related event (located with the info.id) is not in viewport, then scroll down to it.</p>
+
+<p>Here&rsquo;s the hard part: How do I unit test that function?</p>
+
+<p>I don&rsquo;t want to go the PhantomJS route and render the whole page.
+I want it to be fast and part of the, well, unit tests.</p>
+
+<h2>Wait, A Second</h2>
+
+<p>After puzzling through it for a couple of weeks, and soliciting suggestions from a few other devs, it finally hit me, <code>document</code> is just an object like everything else.
+In other words, when we are doing this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.events&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We are merely calling a method on an object.
+It seems so painfully obvious now that I don&rsquo;t know what took so long, but here we are.</p>
+
+<p>Now, if I had told myself that a week ago, I wouldn&rsquo;t have been too impressed.
+My problem is getting elements into the DOM, not the query part.</p>
+
+<p>What I didn&rsquo;t get was that I wasn&rsquo;t looking at the problem the right way.
+The problem wasn&rsquo;t getting elements into the DOM (virtual or otherwise), the problem was getting elements <em>from</em> the DOM.</p>
+
+<p>So, now we have two facts:</p>
+
+<ol>
+<li><code>document</code> is just an object with methods</li>
+<li>To make our tests work, we need <code>document.querySelector</code> to return something predictable</li>
+</ol>
+
+
+<p>At this point, it was clear that the solution was to mock out the return of <code>document.querySelector</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;&lt;Details&gt; In View&#39;</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;will scroll to event details if no info&#39;</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">const</span> <span class="nx">selector</span> <span class="o">=</span> <span class="nx">sinon</span><span class="p">.</span><span class="nx">stub</span><span class="p">(</span><span class="nb">document</span><span class="p">,</span> <span class="s1">&#39;querySelector&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">selector</span><span class="p">.</span><span class="nx">returns</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">getBoundingClientRect</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">top</span><span class="o">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">bottom</span><span class="o">:</span> <span class="mi">100</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">scrollIntoView</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s1">&#39;scroll to selector&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">Details</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">scrollIntoView</span><span class="p">(</span><span class="kc">null</span><span class="p">)).</span><span class="nx">toEqual</span><span class="p">(</span><span class="s1">&#39;scroll to selector&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">selector</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">})</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this test we will just create an object with just enough properties and methods to allow a good test of the method.</p>
+
+<p>We happen to be passing null and so we are hitting the first control structure.
+Testing the other methods is very simple.
+We can stub out getElementById to check that situation.</p>
+
+<p>A key point is to restore the standard behavior at the end with <code>stub.restore()</code> otherwise other tests will not be able to mock the same method.
+The downside to this approach is that if there is an error in that test it will never restore the stub and then any other attempts to mock the same method will also throw an error causing a domino affect where a single error results in 10 more failed tests.</p>
+
+<p>As a final note, I found a lot of value in specifying specific arguments. Doing so looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">describe</span><span class="p">((</span><span class="s1">&#39;Some Test&#39;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kr">const</span> <span class="nx">mockEl</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">getBoundingClientRect</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">top</span><span class="o">:</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">bottom</span><span class="o">:</span> <span class="mi">100</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">scrollIntoView</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s1">&#39;scroll to id&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kr">const</span> <span class="nx">mockElInViewport</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">getBoundingClientRect</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">top</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">bottom</span><span class="o">:</span> <span class="mi">10</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">scrollIntoView</span><span class="o">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s1">&#39;scroll to id&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">let</span> <span class="nx">stub</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">before</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">stub</span> <span class="o">=</span> <span class="nx">sinon</span><span class="p">.</span><span class="nx">stub</span><span class="p">(</span><span class="nb">document</span><span class="p">,</span> <span class="s1">&#39;getElementById&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nx">stub</span><span class="p">.</span><span class="nx">withArgs</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="nx">returns</span><span class="p">(</span><span class="nx">mockEl</span><span class="p">);</span>
+</span><span class='line'>        <span class="nx">stub</span><span class="p">.</span><span class="nx">withArgs</span><span class="p">(</span><span class="mi">11</span><span class="p">).</span><span class="nx">returns</span><span class="p">(</span><span class="nx">mockElInViewport</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">after</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">stub</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Leaving out the actual tests because the point seems clear that you can stub a method and return different results by argument.</p>
+
+<h2>Repeat</h2>
+
+<p>Once I had a method for stubbing out document queries, all sorts of problems faded away.</p>
+
+<p>I could test how to act if something is visible.</p>
+
+<p>I could test how much spacing needed to be added for cases of inline styles.</p>
+
+<p>I could test how elements hight on the page differ from elements lower on the page.</p>
+
+<p>All in all, another great tool for the toolbox.</p>
+
+		
+		
+	</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-07-05T16:11:45-05:00" pubdate data-updated="true"></time></div>
+	
+
+<div class="tags">
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/react/'>react</a>, <a class='category' href='/blog/categories/testing/'>testing</a>
+
+</div>
+
+
+	
+</div></article>
+
+<nav id="pagenavi">
+    
+    
+        <a href="2" class="next">Next</a>
+    
+    <div class="center"><a href="/archives">Blog Archives</a></div>
+</nav></div>
+	<footer id="footer" class="inner">Copyright &copy; 2017
+
+    Joe
+
+<br>
+Powered by Octopress.
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+ })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-84697313-1');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+
+</body>
+</html>
