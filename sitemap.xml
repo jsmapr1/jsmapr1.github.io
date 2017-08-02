@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://www.thejoemorgan.com/blog/2017/08/02/unbreakable-the-craft-of-code/</loc>
+    <lastmod>2017-08-02T08:25:08-05:00</lastmod>
+  </url>
+  <url>
     <loc>http://www.thejoemorgan.com/blog/2017/01/17/javascript-generators-a-practical-example/</loc>
     <lastmod>2017-01-17T07:51:58-06:00</lastmod>
   </url>
