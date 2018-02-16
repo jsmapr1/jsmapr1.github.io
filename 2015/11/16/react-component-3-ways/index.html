@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html >
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		
+		<meta name="generator" content="Hugo 0.34" />
+		<title>React Component 3 ways &middot; </title>
+		<link rel="shortcut icon" href="images/favicon.ico">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/highlight.css">
+
+		
+		<link rel="stylesheet" href="css/monosocialiconsfont.css">
+		
+
+		
+
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href=''> <span class="arrow">←</span>Home</a>
+	
+	<a href='posts'>Archive</a>
+	<a href='tags'>Tags</a>
+	<a href='about'>About</a>
+
+	
+
+	
+</nav>
+
+
+        <section id="wrapper" class="post">
+            <article>
+                <header>
+                    <h1>
+                        React Component 3 ways
+                    </h1>
+                    <h2 class="headline">
+                    Nov 16, 2015 15:50
+                    · 691 words
+                    · 4 minute read
+                      <span class="tags">
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<h1 id="react-components-3-ways">React Components 3 ways</h1>
+
+<p>I&rsquo;ve been building a small react app as part of a larger project.
+I&rsquo;ve also recently been trying to create a culture of pull requests and code reviews in the team.
+A few people are interested. Most aren&rsquo;t.
+However, for the few that have been interested, I&rsquo;ve faced an interesting challenge. Nearly no one is a javascript developer.</p>
+
+<p>Sure, they&rsquo;ve written some jquery here and added a plugin there, but no one has really taken the time to learn about the language.
+I&rsquo;m not saying that to be critical, many are better PHP and Python developers than I am, but it&rsquo;s a fact that a lot of javascript
+looks a little strange to them.</p>
+
+<p>So, we I first committed this code, a standard React component taken almost verbatim from the documentation, I got a lot of confused responses:</p>
+
+<pre><code class="language-javascript">var Menu = React.createClass({
+    getInitialState: function() {
+      return {
+        data: [],
+        filterTag: '',
+      };
+    },
+    componentDidMount: function() {
+      $.ajax({
+        url: 'http://someapiendpoint.com/api',
+        dataType: 'jsonp',
+        cache: false,
+        jsonpCallback: 'callback',
+        success: function(data) {
+          this.setState({data: data.stories});
+        }.bind(this),
+      });
+    },
+    handleTagClick : function(tag) {
+      this.setState({
+        filterTag: tag
+      })
+    },
+    render: function() {
+      return(
+        &lt;div&gt;
+        &lt;TagList tags={getTags(this.state.data)} onTagClick={this.handleTagClick}/&gt;
+        &lt;FilterableList items={this.state.data} filterTag={this.state.filterTag}/&gt;
+        &lt;div&gt;{this.data}&lt;/div&gt;
+        &lt;/div&gt;
+      );
+    }
+})
+
+</code></pre>
+
+<p>One code reviewer asked me to break it into functions to make it more readable.
+I wasn&rsquo;t sure how to respond and finally said, &ldquo;but it is broken into functions. I&rsquo;m passing an object with defined functions into a factory.&rdquo;</p>
+
+<p>He responded, that was fine and I admitted he didn&rsquo;t know much about React or javascript.
+However, that didn&rsquo;t feel right to me.
+He is a good developer and I&rsquo;ve always told code reviewers that saying that code is too confusing is perfectly good feedback.</p>
+
+<p>I decided, therefore, to try again. This time, I explicitly built the object before passing it to the factory:</p>
+
+<pre><code class="language-javascript">var Menu = {};
+
+Menu.getInitialState = function() {
+  return {
+    data: [],
+    filterTag: '',
+  };
+};
+
+Menu.componentDidMount = function() {
+  $.ajax({
+    url: 'http://someapiendpoint.com/api',
+    dataType: 'jsonp',
+    cache: false,
+    jsonpCallback: 'callback',
+    success: function(data) {
+      this.setState({data: data.stories});
+    }.bind(this),
+  });
+}
+
+Menu.handleTagClick = function(tag) {
+  this.setState({
+    filterTag: tag
+  })
+}
+
+Menu.render = function() {
+  return(
+    &lt;div&gt;
+    &lt;TagList tags={getTags(this.state.data)} onTagClick={this.handleTagClick}/&gt;
+    &lt;FilterableList items={this.state.data} filterTag={this.state.filterTag}/&gt;
+    &lt;div&gt;{this.data}&lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default React.createClass(Menu);
+</code></pre>
+
+<p>I&rsquo;ll admit, I liked this way a lot better. It&rsquo;s much more clean and easier to skim.
+The code reviewer also preferred the new way.</p>
+
+<p>Again, I could have left it at that, but I decided to go one step further.
+I&rsquo;ve already been writing most of the code using es6, but thus far I have avoided the <code>class</code> keyword.
+Maybe I&rsquo;m just an old crotchety javascript dev, or maybe I&rsquo;m too easily influenced by other  <a href="https://vimeo.com/97419177">old</a> and <a href="https://medium.com/javascript-scene/how-to-fix-the-es6-class-keyword-2d42bb3f4caf">crotchety</a> javascript developers, but I don&rsquo;t particularly like the <code>class</code> keyword.</p>
+
+<p>Nonetheless, in the name of reusability and team cohesion, I decided to give it a try. Plus, a lot of <a href="https://github.com/airbnb/javascript#constructors">good style guides</a> say to use it.
+So, I made a third example:</p>
+
+<pre><code class="language-javascript">class Menu extends React.Component {
+  constructor(props) {
+    super(props);
+    /*
+     * React components using ES6 classes no longer autobind this to non React methods.
+     * https://github.com/goatslacker/alt/issues/283
+     */
+    this.handleTagClick = this.handleTagClick.bind(this);
+    this.state = {
+      data: [],
+      filterTag: '',
+    }
+  }
+
+  componentDidMount() {
+    $.ajax({
+      url: 'http://someapiendpoint.com/api',
+      dataType: 'jsonp',
+      cache: false,
+      jsonpCallback: 'callback',
+      success: function(data) {
+        this.setState({data: data.stories});
+      }.bind(this),
+    });
+  }
+
+  handleTagClick(tag) {
+    this.setState({
+      filterTag: tag
+    })
+  }
+
+  render() {
+    return(
+      &lt;div&gt;
+      &lt;TagList tags={getTags(this.state.data)} onTagClick={this.handleTagClick}/&gt;
+      &lt;FilterableList items={this.state.data} filterTag={this.state.filterTag}/&gt;
+      &lt;div&gt;{this.data}&lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+export default Menu
+</code></pre>
+
+<p>By this point, the reviewer was thrilled. And I&rsquo;ll admit, for people coming from other OO languages, and particularly PHP, this will be a lot more familiar.
+Personally, I like the second version best. Although, really that&rsquo;s just because it looks like &ldquo;real&rdquo; javascript to me (whatever that means).</p>
+
+<p>However, writing good code is about compormise. We compromise abstractions for the sake of time. We compromise cohesion for the sake of (visual) design.
+And sometimes we need to check our own preferences for the sake of the team.
+Each version works perfectly fine, but one will have a much greater chance of being used by others in the future. And really, that&rsquo;s the most important thing.</p>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+    <p class="small">
+    
+       © Copyright 2018 <i class="fa fa-heart" aria-hidden="true"></i> 
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+
+    </body>
+</html>

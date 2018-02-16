@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html >
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		
+		<meta name="generator" content="Hugo 0.34" />
+		<title>Testing Angular UI Modals &middot; </title>
+		<link rel="shortcut icon" href="images/favicon.ico">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/highlight.css">
+
+		
+		<link rel="stylesheet" href="css/monosocialiconsfont.css">
+		
+
+		
+
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href=''> <span class="arrow">←</span>Home</a>
+	
+	<a href='posts'>Archive</a>
+	<a href='tags'>Tags</a>
+	<a href='about'>About</a>
+
+	
+
+	
+</nav>
+
+
+        <section id="wrapper" class="post">
+            <article>
+                <header>
+                    <h1>
+                        Testing Angular UI Modals
+                    </h1>
+                    <h2 class="headline">
+                    Feb 20, 2015 11:07
+                    · 381 words
+                    · 2 minute read
+                      <span class="tags">
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p>I recently ran into an issue while testing an modal using <a href="http://angular-ui.github.io/bootstrap/">Angular UI Bootstrap</a>. My goal was to create a directive that will trigger a modal to open when clicked. The directive code is relatively simple:</p>
+
+<pre><code class="language-javascript">
+app.directive('modalTrigger', ['$modal', 'sharedData', function($modal, sharedData) {
+    return {
+        scope : {
+            submitUrl : '@'
+        },
+        link: function(scope, elem, attributes) {
+            elem.bind('click', function() {
+                $modal.open({
+                    template: &quot;&lt;div another-directive&gt;&lt;/div&gt;&quot;,
+                    controller: 'AwesomeController as ac',
+                    resolve : {
+                        submitUrl : function() {
+                            return scope.submitUrl;
+                        }
+                    }
+                })
+                    .result.then(function() {
+                        //Something on close
+                    },function() {
+                        //Something on dismiss
+                    })
+            })
+        }
+    }
+}]);
+</code></pre>
+
+<p>The idea is to be able to set any element to trigger a modal (which grabs some content via ajax, but that&rsquo;s a different issue):</p>
+
+<pre><code class="language-html">&lt;button modal-trigger submit-url=&quot;/somepage&quot;&gt;
+</code></pre>
+
+<p>The problem I had was in testing the code (with karma and jasmine) was getting the modal to return a result promise.</p>
+
+<p>Here was the original test:</p>
+
+<pre><code class="language-javascript">describe('Directive: modalTrigger', function() {
+    var element, scope, $compile, $modal, fakeModal;
+    beforeEach(module('my-mod'));
+    beforeEach(inject(function(_$compile_, $rootScope, _$modal_) {
+        $compile = _$compile_;
+        $modal = _$modal_;
+        scope = $rootScope.$new();
+        spyOn($modal, 'open');
+        element = '&lt;a modal-trigger ng-app=&quot;some-app&quot; submit-url=&quot;/test&quot;&gt;';
+        element = $compile(element)(scope);
+        scope.$digest();
+    }))
+    it('will open a modal when clicked', function(){
+        expect($modal.open).not.toHaveBeenCalled()
+        element.triggerHandler('click');
+        expect($modal.open).toHaveBeenCalled()
+    })
+})
+</code></pre>
+
+<p>The problem is the spy. Originally I didn&rsquo;t use the modal result promise. When I explicitly started using it, the tests started failing. The reason is that when a spy is set in jasmine, it stubs out the object, but does not execute it in the code. The fix is easy, I could either create a fake or I can just tell jasmine to use the actual object that I am spying on.</p>
+
+<p>Here&rsquo;s an example of creating a fake object:</p>
+
+<pre><code class="language-javascript">    fakeModal = {
+        result: {
+            then: function() {
+            }
+        },
+        close: function( item ) {
+        },
+        dismiss: function( type ) {
+        }
+    };
+    spyOn($modal, 'open').andReturn(fakeModal);
+</code></pre>
+
+<p>Ultimately I decided to just call through to the actual object since I wasn&rsquo;t testing the promise and didn&rsquo;t need a mock, but I wanted to keep the test as close as possible to the actual code:</p>
+
+<pre><code class="language-javascript">spyOn($modal, 'open').andCallThrough();
+</code></pre>
+
+<p>Viola. Now I can test that my directive is actually executing as expected. This is all very simple, but a nice way to isolate test code and to check for a call to a promise (or anything really).</p>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+    <p class="small">
+    
+       © Copyright 2018 <i class="fa fa-heart" aria-hidden="true"></i> 
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+
+    </body>
+</html>

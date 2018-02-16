@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html >
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		
+		<meta name="generator" content="Hugo 0.34" />
+		<title>Building an NPM Package Part 2: Package.json &middot; </title>
+		<link rel="shortcut icon" href="images/favicon.ico">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/highlight.css">
+
+		
+		<link rel="stylesheet" href="css/monosocialiconsfont.css">
+		
+
+		
+
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href=''> <span class="arrow">←</span>Home</a>
+	
+	<a href='posts'>Archive</a>
+	<a href='tags'>Tags</a>
+	<a href='about'>About</a>
+
+	
+
+	
+</nav>
+
+
+        <section id="wrapper" class="post">
+            <article>
+                <header>
+                    <h1>
+                        Building an NPM Package Part 2: Package.json
+                    </h1>
+                    <h2 class="headline">
+                    Jul 27, 2016 08:16
+                    · 1441 words
+                    · 7 minute read
+                      <span class="tags">
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    
+
+<p>Anytime I begin to look deeply into an open source project should begin at the package file.
+The reason I do this is because it gives a starting point for nearly everything and I can easily get a lot of clues about the project from these points.</p>
+
+<p>Most modern web projects have something like a package file.
+Some languages make this easier than others; the package.json file or composer.json file have scripts and dependencies along with other goodies.
+Other projects split them out a bit; Ruby has a gemfile, but also a rakefile with various scripts.</p>
+
+<p>Nonetheless, it is a good starting point no matter the language.
+And fortunately for us, npm is one of the best, I would say the best, out there.
+It&rsquo;s a nice time to be a javascript developer.</p>
+
+<p>#Package.json
+With that in mind, let&rsquo;s dive in.
+I&rsquo;m not going to go into detail about every single field.
+The <a href="https://docs.npmjs.com/files/package.json">documentation</a> is actually very good, so there&rsquo;s no reason to duplicate effort.
+Instead, I will point out a few particulars that I enjoy using and enjoy seeing others use.</p>
+
+<p>#main
+This is the primary entry point for your script.</p>
+
+<p>When a user types:<code>require('your-package')</code> or <code>import yourPackage from your-package</code> the main file is what that import will refernce.</p>
+
+<p>As <a href="/blog/2016/05/31/building-an-npm-package-part-1/">mentioned previously</a> this is something to consider if you want a single entry point or multiple entry points.</p>
+
+<p>There can be only one main file, but the rest of the structure of the project will determine how other pieces can be imported.
+For example, if you have other chunks of code in the <strong>cool</strong> directory, than a user can import by referencing that directory (e.g. <code>import {coolaid} from 'cool-package/cool/superCool'</code>).
+More on this later.</p>
+
+<p>For most projects this will be something like <code>main.js</code> or <code>index.js</code>.</p>
+
+<p>#bin</p>
+
+<p>I haven&rsquo;t used this on any projects, but this is how you specify a project that should be placed in the PATH.
+In other words, this is how you create a command line utility (think mocha or babel or, well, anything you run from the command line).</p>
+
+<p>The syntax is simple. For a command line that is the same as the package name, it is simply: <code>bin: './path/to/executable'</code>.
+You can also specify a name in an object:</p>
+
+<pre><code class="language-javascript">&quot;bin&quot;: {
+  &quot;my&quot;: &quot;./path/to/my-package&quot;
+}
+</code></pre>
+
+<p>Again, as an example, here is the bin for mocha</p>
+
+<pre><code class="language-javascript">&quot;bin&quot;: {
+  &quot;_mocha&quot;: &quot;./bin/_mocha&quot;,
+  &quot;mocha&quot;: &quot;./bin/mocha&quot;
+}
+</code></pre>
+
+<p>If you are curious, if you want to install a file with a command line interface that is installed only in a project,
+you just have to specify the path to the node_modules bin e.g. <code>node_modules/.bin/mocha</code>.</p>
+
+<p>You can also reference the module in a npm script and the correct path will be inferred.</p>
+
+<p>Speaking of scripts&hellip;</p>
+
+<p>#script
+This is by far my favorite part of npm (other than packaging dependencies).</p>
+
+<p>I&rsquo;ve signed on to the <a href="https://medium.freecodecamp.com/why-i-left-gulp-and-grunt-for-npm-scripts-3d6853dd22b8#.fhl757bda">recent trend</a> of using <a href="http://blog.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/">npm scripts in lieu of gulp or grunt or any of those things</a>.</p>
+
+<p>Why? There are two reasons. The first is that it is much easier to play around with scripts at the command line.
+That is, it&rsquo;s much easier to experiment with different flags and options from the command line and then, once it is working correctly, I just shove it into an npm script.</p>
+
+<p>Secondly, as I mentioned at the beginning, a package.json file is a great place to get an idea of what a project does and seeing the scripts is a big part of that.</p>
+
+<p>Here&rsquo;s one that I particularly like from [redux-thunk]()</p>
+
+<pre><code class="language-javascript">&quot;scripts&quot;: {
+  &quot;clean&quot;: &quot;rimraf lib dist es&quot;,
+  &quot;build&quot;: &quot;npm run build:commonjs &amp;&amp; npm run build:umd &amp;&amp; npm run build:umd:min &amp;&amp; npm run build:es&quot;,
+  &quot;prepublish&quot;: &quot;npm run clean &amp;&amp; npm run test &amp;&amp; npm run build&quot;,
+  &quot;posttest&quot;: &quot;npm run lint&quot;,
+  &quot;lint&quot;: &quot;eslint src test&quot;,
+  &quot;test&quot;: &quot;cross-env BABEL_ENV=commonjs mocha --compilers js:babel-core/register --reporter spec test/*.js&quot;,
+  &quot;build:commonjs&quot;: &quot;cross-env BABEL_ENV=commonjs babel src --out-dir lib&quot;,
+  &quot;build:es&quot;: &quot;cross-env BABEL_ENV=es babel src --out-dir es&quot;,
+  &quot;build:umd&quot;: &quot;cross-env BABEL_ENV=commonjs NODE_ENV=development webpack&quot;,
+  &quot;build:umd:min&quot;: &quot;cross-env BABEL_ENV=commonjs NODE_ENV=production webpack&quot;
+},
+</code></pre>
+
+<p>I like this because I can see exactly how a high-quality package is built and maintained.
+I can see which testing suite is used. The location of the tests (in this case it would have been obvious, but still).
+I can see how the build is implemented and so on.</p>
+
+<p>Finally, as a potential contributor, it&rsquo;s fairly obvious what I need to do to make sure that the integrity of the project is maintained.
+I don&rsquo;t need to worry about having gulp globally installed or mocha. It&rsquo;s all packaged and referenced.
+I just need to run <code>npm test</code> to test and <code>npm run lint</code> to lint.
+Super easy.</p>
+
+<p>Ok, enough gushing.
+There is a <a href="https://docs.npmjs.com/misc/scripts">a lot you can do with scripts</a>, but here are some of the best use cases:</p>
+
+<ul>
+<li><strong>test</strong>: Always have tests. This is a reserved script, so you can run it by simply typing <code>npm test</code></li>
+<li><strong>lint</strong>: Always lint your code. This is not reserved, so you must run <code>npm run lint</code></li>
+<li><strong>start</strong>: This is another reserved script, add in whatever you need to get a server up and running. If you have a server.js file, you do not need to write the script, but I think you should so it will be clear to future users.</li>
+<li><strong>prepublish</strong>: This is a script that will run when you publish your project. This matters because you do not need to check in transpiled code.
+For example. This script <code>&quot;prepublish&quot;: &quot;npm run build&quot;</code> will run the build script <code>&quot;build&quot;: &quot;babel src -d ./&quot;</code> which will compile the es6 code into the root directory.
+I also could have it compile to a build directory <code>&quot;build&quot;: &quot;babel src -d ./build&quot;,</code>, but that would make importing from non-main files a little less intuitive.</li>
+<li><strong>anything</strong>: I have a rule that if I type something more than once a day (in regards to a package) it should go in a script since future users will likely need to do it too. For example, I had a recent project that I would deploy to production.
+Since I&rsquo;m not planning on publishing this as an npm package, I just added a deploy script, so <code>npm run deploy</code> would update the server. Sure, it&rsquo;s not a full one CI build (i.e. if tests are breaking, it would still deploy), but it worked in my situation.</li>
+</ul>
+
+<p>Learn to love scripts. Your life will be better.</p>
+
+<h1 id="all-the-other-things">All the other things</h1>
+
+<p>There&rsquo;s lots, lots, lots more, but those are better explored on a case-by-case basis.
+However, there are best practices, so if you are planning on publishing, be sure to add:</p>
+
+<ul>
+<li><strong>name</strong>: Obviously.</li>
+<li><strong>descript</strong>: Obviously.</li>
+<li><strong>keywords</strong>: Make it easier to be discovered</li>
+<li><strong>bugs</strong>: Location for issues (usually on github/project/issues)</li>
+<li><strong>license</strong>: Part of <code>npm init</code> so it&rsquo;s easy to remember. Lots of options, though.</li>
+<li><strong>version</strong>: I prefere Major.Minor.Patch. Change the first number on breaking changes or major new features. The second on new features, but no breaks. And the third for, well, patches to existing features.</li>
+</ul>
+
+<p>Again, the documentation is great, so peruse it occasionally or before you publish to make sure you have everything.</p>
+
+<h1 id="putting-it-together-making-multiple-entry-points">Putting it together: Making multiple entry points</h1>
+
+<p>To return to a goal from the <a href="/blog/2016/05/31/building-an-npm-package-part-1/">planning stage</a>, how can we use our package.json file to create an npm package with multiple entry points?</p>
+
+<p>It&rsquo;s actually fairly simple. The trick is to understand that there will need to be a little structure, but it can be simple and clear.</p>
+
+<p>Let&rsquo;s start with a file structure such as this:</p>
+
+<pre>
+-- src/
+    -- index.js
+    -- components/
+        -- cool.js
+        -- awesome.js
+</pre>
+
+<p>In our package.json file set <strong>main</strong> to be index.js.
+Then in the build script, set the output to the root of the project.</p>
+
+<pre><code class="language-javascript">  &quot;main&quot;: &quot;index.js&quot;,
+  &quot;scripts&quot;: {
+    &quot;build&quot;: &quot;babel src -d ./&quot;,
+    &quot;prepublish&quot;: &quot;npm run build&quot;
+  },
+</code></pre>
+
+<p>That&rsquo;s all there is to it.
+Now when a user can import the default along with other components not in the main file:</p>
+
+<pre><code class="language-javascript">import yourPackage from 'your-package';
+import {cool} from 'your-package/components/cool';
+</code></pre>
+
+<p>You can, of course, link everything from your main file:</p>
+
+<pre><code class="language-javascript">//inside index.js
+import {cool, rad} from './components/cool';
+import {awesome} from './components/awesome';
+
+export {
+  cool,
+  rad,
+  awesome,
+}
+</code></pre>
+
+<p>But that has the downside of growing out of control rather quickly.
+Personally, I like have nested, separate functions, but it&rsquo;s a choice every author must make.</p>
+
+<p>So there you have it.
+The <em>package.json</em> file is great and there&rsquo;s tons that you can do with it.
+I know I just barely scratched the surface.
+As a recommendation, when ever you have some time to kill, look up your favorite npm package on github and take a few minutes to explore the package.json file and the project structure.
+It will give you many sources for ideas on your own projects.</p>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+    <p class="small">
+    
+       © Copyright 2018 <i class="fa fa-heart" aria-hidden="true"></i> 
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+
+    </body>
+</html>
