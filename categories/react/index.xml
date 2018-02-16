@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>React on </title>
+    <link>/categories/react/</link>
+    <description>Recent content in React on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Fri, 23 Sep 2016 08:15:14 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/react/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>react animations</title>
+      <link>/2016/09/23/react-animations/</link>
+      <pubDate>Fri, 23 Sep 2016 08:15:14 +0000</pubDate>
+      
+      <guid>/2016/09/23/react-animations/</guid>
+      <description>Previously, I wrote about React animations for creating a dropdown menu, but after spending more and more time working with them, I decided to explore exactly how animations fit into the React lifecycle.
+Two Animations There are two kinds of component animations in React.
+ The component is already in the DOM The component is entering the DOM  The first kind are not that hard to deal with. In the past, I&amp;rsquo;ve added a CSS class to trigger a transition.</description>
+    </item>
+    
+    <item>
+      <title>Using Sinon to Test Document Functions</title>
+      <link>/2016/07/05/using-sinon-to-test-document-functions/</link>
+      <pubDate>Tue, 05 Jul 2016 16:11:45 +0000</pubDate>
+      
+      <guid>/2016/07/05/using-sinon-to-test-document-functions/</guid>
+      <description>That Sweet, Sweet Code Coverage On my most recent React project, I&amp;rsquo;ve really been trying to get that 100% code coverage. It hasn&amp;rsquo;t been bad for the most part, but I hit a wall when a few functions needed to query the DOM.
+For the most part, I isolated the DOM as much as possible and as a result most functions were very easy to test. Still, I got to the point that the functionality required knowing exactly where elements were on the page.</description>
+    </item>
+    
+    <item>
+      <title>Mocking Apis Locally with webpack and json-server</title>
+      <link>/2016/04/07/mocking-apis-locally-with-webpack-dot-environmentplugin-and-json-server/</link>
+      <pubDate>Thu, 07 Apr 2016 16:00:37 +0000</pubDate>
+      
+      <guid>/2016/04/07/mocking-apis-locally-with-webpack-dot-environmentplugin-and-json-server/</guid>
+      <description>I always love the beginning of a new project. It&amp;rsquo;s a great time to rethink a few basic fundamentals and to improve the overall development experience.
+On my most recent project, I decided to give webpack a try. I&amp;rsquo;ve thought about using webpack before, but never pulled the trigger until one blogger deemed it the &amp;lsquo;winner&amp;rsquo; of dependency management I decided. Why not. Let&amp;rsquo;s give it a go.
+I&amp;rsquo;m not fully converted quite yet, but I did run into an interesting use case today.</description>
+    </item>
+    
+    <item>
+      <title>Testing Redux Combined Reducers</title>
+      <link>/2016/03/25/testing-redux-reducers/</link>
+      <pubDate>Fri, 25 Mar 2016 14:52:51 +0000</pubDate>
+      
+      <guid>/2016/03/25/testing-redux-reducers/</guid>
+      <description>I have a few problems recently testing Redux reducers. The documentation is helpful but doesn&amp;rsquo;t match the rest of the tutorial.
+Simple Test Consider a basic reducer:
+export function tagFilter(state = [], action) { switch(action.type) { case &#39;TAG_FILTER&#39;: return [...state, action.tag] default: return state; } }  The test for this is very simple. Call the function. Pass a state and an action. Expect the result:
+import expect from &#39;expect&#39;; import {tagFilter} from &#39;.</description>
+    </item>
+    
+    <item>
+      <title>Creating A Dropdown Menu in React</title>
+      <link>/2016/01/05/creating-a-dropdown-menu-in-react/</link>
+      <pubDate>Tue, 05 Jan 2016 08:14:24 +0000</pubDate>
+      
+      <guid>/2016/01/05/creating-a-dropdown-menu-in-react/</guid>
+      <description>Here&amp;rsquo;s a quick guide to creating a dropdown menu with React native components.
+Just want code? Here&amp;rsquo;s a demo: See the Pen React CSSTransitionGroup DropDown Menu by Joe Morgan (@jsmapr1) on CodePen.
+
+React provides a simple component for adding animations to items. It can do a few things, but in short, it works with CSS3 transitions by adding classes for a short amount of time to allow the transition to take affect.</description>
+    </item>
+    
+    <item>
+      <title>Building Production Ready React</title>
+      <link>/2015/12/02/building-production-ready-react/</link>
+      <pubDate>Wed, 02 Dec 2015 16:28:24 +0000</pubDate>
+      
+      <guid>/2015/12/02/building-production-ready-react/</guid>
+      <description>##Production Ready React React is still an evolving project. Add to that complications of needing to transpile any javascript with ES6 syntax and you have best practices that are, at best, a moving target. After running into a few issues, I wanted to get all the information I have together in one accessible place.
+Here are my goals for the current project:
+ Write code in ES6 syntax (but compiled so that it can be cross-browser compatible) Make production code as small as possible including all dependencies Make the project easy to deploy and hand off to other developers  This list seemed fairly simple, but there were a few surprises that I did not anticipate.</description>
+    </item>
+    
+    <item>
+      <title>React Component 3 ways</title>
+      <link>/2015/11/16/react-component-3-ways/</link>
+      <pubDate>Mon, 16 Nov 2015 15:50:52 +0000</pubDate>
+      
+      <guid>/2015/11/16/react-component-3-ways/</guid>
+      <description>React Components 3 ways I&amp;rsquo;ve been building a small react app as part of a larger project. I&amp;rsquo;ve also recently been trying to create a culture of pull requests and code reviews in the team. A few people are interested. Most aren&amp;rsquo;t. However, for the few that have been interested, I&amp;rsquo;ve faced an interesting challenge. Nearly no one is a javascript developer.
+Sure, they&amp;rsquo;ve written some jquery here and added a plugin there, but no one has really taken the time to learn about the language.</description>
+    </item>
+    
+  </channel>
+</rss>

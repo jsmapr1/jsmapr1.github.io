@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>/about/</loc>
+    <lastmod>2018-02-15T09:07:27-06:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2017/08/02/unbreakable-the-craft-of-code/</loc>
+    <lastmod>2017-08-02T08:25:08+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2017/01/17/javascript-generators-a-practical-example/</loc>
+    <lastmod>2017-01-17T07:51:58+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2017/01/12/es6-patterns-in-the-wild/</loc>
+    <lastmod>2017-01-12T14:11:07+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/11/21/testing-apis-in-angular-2/</loc>
+    <lastmod>2016-11-21T11:44:03+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/09/23/react-animations/</loc>
+    <lastmod>2016-09-23T08:15:14+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/08/26/building-an-npm-package-part-4/</loc>
+    <lastmod>2016-08-26T15:23:21+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/08/18/building-an-npm-package-part-3-testing-locally/</loc>
+    <lastmod>2016-08-18T10:09:11+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/08/12/craftsmanship/</loc>
+    <lastmod>2016-08-12T14:08:58+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/07/27/building-an-npm-package-part-2-package-dot-json/</loc>
+    <lastmod>2016-07-27T08:16:05+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/07/05/using-sinon-to-test-document-functions/</loc>
+    <lastmod>2016-07-05T16:11:45+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/05/31/building-an-npm-package-part-1/</loc>
+    <lastmod>2016-05-31T16:21:27+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/05/18/testing-apis-with-nock/</loc>
+    <lastmod>2016-05-18T09:27:41+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/04/08/that-feeling-of-beautiful-code/</loc>
+    <lastmod>2016-04-08T16:08:19+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/04/07/mocking-apis-locally-with-webpack-dot-environmentplugin-and-json-server/</loc>
+    <lastmod>2016-04-07T16:00:37+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/03/25/testing-redux-reducers/</loc>
+    <lastmod>2016-03-25T14:52:51+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/03/08/ways-coders-lead/</loc>
+    <lastmod>2016-03-08T14:23:58+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2016/01/05/creating-a-dropdown-menu-in-react/</loc>
+    <lastmod>2016-01-05T08:14:24+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/12/02/building-production-ready-react/</loc>
+    <lastmod>2015-12-02T16:28:24+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/11/17/why-i-love-micro-training/</loc>
+    <lastmod>2015-11-17T08:56:21+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/11/16/react-component-3-ways/</loc>
+    <lastmod>2015-11-16T15:50:52+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/09/03/creating-scrolling-self-drawing-lines/</loc>
+    <lastmod>2015-09-03T16:49:04+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/05/13/php-unit-mocks/</loc>
+    <lastmod>2015-05-13T16:32:53+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/03/19/refactoring-scope-from-angular-projects/</loc>
+    <lastmod>2015-03-19T11:52:43+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/03/18/interviews-are-about-the-future-not-the-past/</loc>
+    <lastmod>2015-03-18T14:12:45+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/03/17/what-makes-a-good-development-team/</loc>
+    <lastmod>2015-03-17T11:17:22+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/02/20/testing-angular-ui/</loc>
+    <lastmod>2015-02-20T11:07:53+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/01/27/leading-without-authority/</loc>
+    <lastmod>2015-01-27T16:53:43+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2015/01/08/protractor-in-iframe/</loc>
+    <lastmod>2015-01-08T15:12:10+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2018-02-15T09:07:27-06:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/angular/</loc>
+    <lastmod>2016-11-21T11:44:03+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/</loc>
+    <lastmod>2016-11-21T11:44:03+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/craftsmanship/</loc>
+    <lastmod>2016-08-12T14:08:58+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/ideas/</loc>
+    <lastmod>2016-08-12T14:08:58+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/javascrip/</loc>
+    <lastmod>2016-08-18T10:09:11+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/javascript/</loc>
+    <lastmod>2017-08-02T08:25:08+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/javscript/</loc>
+    <lastmod>2016-03-25T14:52:51+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/leadership/</loc>
+    <lastmod>2016-03-08T14:23:58+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/npm/</loc>
+    <lastmod>2016-08-26T15:23:21+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/personal/</loc>
+    <lastmod>2016-04-08T16:08:19+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/php/</loc>
+    <lastmod>2015-05-13T16:32:53+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/posts/</loc>
+    <lastmod>2017-08-02T08:25:08+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/react/</loc>
+    <lastmod>2016-09-23T08:15:14+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/testing/</loc>
+    <lastmod>2016-07-05T16:11:45+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

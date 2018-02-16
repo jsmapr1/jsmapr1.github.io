@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html >
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		
+		
+		<meta name="generator" content="Hugo 0.34" />
+		<title>Creating A Dropdown Menu in React &middot; </title>
+		<link rel="shortcut icon" href="images/favicon.ico">
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/highlight.css">
+
+		
+		<link rel="stylesheet" href="css/monosocialiconsfont.css">
+		
+
+		
+
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href=''> <span class="arrow">←</span>Home</a>
+	
+	<a href='posts'>Archive</a>
+	<a href='tags'>Tags</a>
+	<a href='about'>About</a>
+
+	
+
+	
+</nav>
+
+
+        <section id="wrapper" class="post">
+            <article>
+                <header>
+                    <h1>
+                        Creating A Dropdown Menu in React
+                    </h1>
+                    <h2 class="headline">
+                    Jan 5, 2016 08:14
+                    · 470 words
+                    · 3 minute read
+                      <span class="tags">
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p>Here&rsquo;s a quick guide to creating a dropdown menu with React native components.</p>
+
+<p>Just want code? Here&rsquo;s a demo:
+<p data-height="268" data-theme-id="0" data-slug-hash="gPmPyr" data-default-tab="result" data-user="jsmapr1" class='codepen'>See the Pen <a href='http://codepen.io/jsmapr1/pen/gPmPyr/'>React CSSTransitionGroup DropDown Menu</a> by Joe Morgan (<a href='http://codepen.io/jsmapr1'>@jsmapr1</a>) on <a href='http://codepen.io'>CodePen</a>.</p>
+<script async src="//assets.codepen.io/assets/embed/ei.js"></script></p>
+
+<p>React provides a simple component for <a href="https://facebook.github.io/react/docs/animation.html">adding animations to items</a>.
+It can do a few things, but in short, it works with CSS3 transitions by adding classes for a short amount of time to allow the transition to take affect.</p>
+
+<p>To start, some simple markup:</p>
+
+<pre><code class="language-html">&lt;div id=&quot;menuContainer&quot;&gt;&lt;/div&gt;
+&lt;div&gt;
+  &lt;p&gt;Body Text&lt;/p&gt;
+  &lt;p&gt;Body Text&lt;/p&gt;
+  &lt;p&gt;Body Text&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>Obviously, we want the menu to replace the menuContainer element.</p>
+
+<p>Now, we need to create a small menu component.
+For simplicity sake, I&rsquo;m leaving state on the component, but I&rsquo;ve since delegated state handling to redux, but the idea is similar:</p>
+
+<pre><code class="language-javascript">let ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
+
+class DropDown extends React.Component {
+  constructor(props) {
+    super(props);
+    this.toggleMenu = this.toggleMenu.bind(this);
+    this.state = {
+      menuActive: false
+    };
+  }
+
+  toggleMenu() {
+    let menuState = !this.state.menuActive;
+    this.setState({
+      menuActive: menuState
+    });
+  }
+
+  render() {
+    let menu;
+    if(this.state.menuActive) {
+      menu = &lt;div&gt;
+                &lt;ul&gt;
+                  &lt;li&gt;First Item &lt;/li&gt;
+                  &lt;li&gt;Second Item &lt;/li&gt;
+                  &lt;li&gt;Third Item &lt;/li&gt;
+                &lt;/ul&gt;
+              &lt;/div&gt;
+    } else {
+      menu = &quot;&quot;;
+    }
+    return (
+      &lt;div id = &quot;menu&quot;&gt;
+        &lt;i className = &quot;fa fa-plus&quot; onClick = { this.toggleMenu }/&gt; 
+      &lt;ReactCSSTransitionGroup transitionName = &quot;menu&quot; transitionEnterTimeout={1000} transitionLeaveTimeout={1000}&gt; 
+        {menu} 
+      &lt;/ReactCSSTransitionGroup&gt;
+    &lt;/div&gt;
+    )
+  }
+}
+
+ReactDOM.render(
+  &lt;DropDown /&gt;,
+    document.getElementById('menuContainer')
+);
+
+</code></pre>
+
+<p>Ok, so what&rsquo;s happening here.
+I&rsquo;m creating a simple react element with a state of menuActive.
+If we click an icon (I&rsquo;m using <a href="https://fortawesome.github.io/Font-Awesome/">font awesome</a>), then the menuActive state should toggle to true and the menu should animate.
+That explains state, the toggleMenu function and the <em>i</em> element.</p>
+
+<p>The trick is the ReactCSSTransitionGroup.
+I add the transitionName of menu along with a transitionEnterTimeout and a transitionLeaveTimeout.
+This tells react to add the class of menu for 1 second when it adds the new child elements (the menu) and to add it for 1 second when it removes the child elements.
+This leaves time for the css transitions to do there thing.</p>
+
+<p>Speaking of, the css is rather simple&hellip;</p>
+
+<pre><code class="language-css">.menu-enter {
+  max-height: 0px;
+  -webkit-transition: max-height 1s ease;
+  overflow: hidden; 
+}
+
+.menu-enter.menu-enter-active {
+  height: auto;
+  max-height: 100px;
+}
+
+.menu-leave {
+  max-height: 100px;
+  -webkit-transition: max-height 1s ease;
+}
+
+.menu-leave.menu-leave-active {
+  overflow: hidden;
+  max-height: 0px;
+}
+
+ul {
+  border: #ababab solid 1px;
+  width: 70%;
+}
+
+</code></pre>
+
+<p>All we are doing is adding a transition to a max-height of 100px.
+Since the menu is dynamically generated, we need max height since I have no idea how big it will be. In production, it will be even larger.</p>
+
+<p>The transitions will take 1 second which is the same as transitionEnterTimeout and transitionLeaveTimeout.</p>
+
+<p>That&rsquo;s pretty much all there is to it. Simple and easy.</p>
+
+<p>The downside is, that CSS3 does not work on ie9 which I do still support, but there are conditional tags for that.</p>
+
+                </section>
+            </article>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+    <p class="small">
+    
+       © Copyright 2018 <i class="fa fa-heart" aria-hidden="true"></i> 
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+
+    </body>
+</html>

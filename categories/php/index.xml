@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Php on </title>
+    <link>/categories/php/</link>
+    <description>Recent content in Php on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Wed, 13 May 2015 16:32:53 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/php/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>PHP Unit Mocks</title>
+      <link>/2015/05/13/php-unit-mocks/</link>
+      <pubDate>Wed, 13 May 2015 16:32:53 +0000</pubDate>
+      
+      <guid>/2015/05/13/php-unit-mocks/</guid>
+      <description>I recently had to do some development with a third party api. We&amp;rsquo;ve worked with several apis in the past and they&amp;rsquo;ve always been a huge hassle and, more importantly, we&amp;rsquo;ve never bothered to test code so we can isolate problems should there be a change by the api provider (we are always the last to be notified).
+##PHP Unit Mocks The best way to test an api is to set up a mock so we can test our api code against the expected return value (the json or xml or whatever).</description>
+    </item>
+    
+  </channel>
+</rss>
