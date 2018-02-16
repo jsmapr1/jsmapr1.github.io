@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Javscript on </title>
-    <link>/categories/javscript/</link>
+    <link>http://thejoemorgan.com/categories/javscript/</link>
     <description>Recent content in Javscript on </description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Fri, 25 Mar 2016 14:52:51 +0000</lastBuildDate>
     
-	<atom:link href="/categories/javscript/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://thejoemorgan.com/categories/javscript/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Testing Redux Combined Reducers</title>
-      <link>/2016/03/25/testing-redux-reducers/</link>
+      <link>http://thejoemorgan.com/2016/03/25/testing-redux-reducers/</link>
       <pubDate>Fri, 25 Mar 2016 14:52:51 +0000</pubDate>
       
-      <guid>/2016/03/25/testing-redux-reducers/</guid>
+      <guid>http://thejoemorgan.com/2016/03/25/testing-redux-reducers/</guid>
       <description>I have a few problems recently testing Redux reducers. The documentation is helpful but doesn&amp;rsquo;t match the rest of the tutorial.
 Simple Test Consider a basic reducer:
 export function tagFilter(state = [], action) { switch(action.type) { case &#39;TAG_FILTER&#39;: return [...state, action.tag] default: return state; } }  The test for this is very simple. Call the function. Pass a state and an action. Expect the result:

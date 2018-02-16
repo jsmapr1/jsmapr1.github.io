@@ -2,60 +2,60 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Testing on </title>
-    <link>/categories/testing/</link>
+    <link>http://thejoemorgan.com/categories/testing/</link>
     <description>Recent content in Testing on </description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Tue, 05 Jul 2016 16:11:45 +0000</lastBuildDate>
     
-	<atom:link href="/categories/testing/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="http://thejoemorgan.com/categories/testing/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Using Sinon to Test Document Functions</title>
-      <link>/2016/07/05/using-sinon-to-test-document-functions/</link>
+      <link>http://thejoemorgan.com/2016/07/05/using-sinon-to-test-document-functions/</link>
       <pubDate>Tue, 05 Jul 2016 16:11:45 +0000</pubDate>
       
-      <guid>/2016/07/05/using-sinon-to-test-document-functions/</guid>
+      <guid>http://thejoemorgan.com/2016/07/05/using-sinon-to-test-document-functions/</guid>
       <description>That Sweet, Sweet Code Coverage On my most recent React project, I&amp;rsquo;ve really been trying to get that 100% code coverage. It hasn&amp;rsquo;t been bad for the most part, but I hit a wall when a few functions needed to query the DOM.
 For the most part, I isolated the DOM as much as possible and as a result most functions were very easy to test. Still, I got to the point that the functionality required knowing exactly where elements were on the page.</description>
     </item>
     
     <item>
       <title>testing apis with nock</title>
-      <link>/2016/05/18/testing-apis-with-nock/</link>
+      <link>http://thejoemorgan.com/2016/05/18/testing-apis-with-nock/</link>
       <pubDate>Wed, 18 May 2016 09:27:41 +0000</pubDate>
       
-      <guid>/2016/05/18/testing-apis-with-nock/</guid>
+      <guid>http://thejoemorgan.com/2016/05/18/testing-apis-with-nock/</guid>
       <description>I recently wrote about how to use json-server to mock api calls when writing web apps. And that is very useful when you want write code and not have to worry about latency or api limits. However, it is still an extra dependency and may not make sense in all projects.
 Testing needs to be self contained and have minimal external dependencies (for now, I will just talk about unit testing).</description>
     </item>
     
     <item>
       <title>PHP Unit Mocks</title>
-      <link>/2015/05/13/php-unit-mocks/</link>
+      <link>http://thejoemorgan.com/2015/05/13/php-unit-mocks/</link>
       <pubDate>Wed, 13 May 2015 16:32:53 +0000</pubDate>
       
-      <guid>/2015/05/13/php-unit-mocks/</guid>
+      <guid>http://thejoemorgan.com/2015/05/13/php-unit-mocks/</guid>
       <description>I recently had to do some development with a third party api. We&amp;rsquo;ve worked with several apis in the past and they&amp;rsquo;ve always been a huge hassle and, more importantly, we&amp;rsquo;ve never bothered to test code so we can isolate problems should there be a change by the api provider (we are always the last to be notified).
 ##PHP Unit Mocks The best way to test an api is to set up a mock so we can test our api code against the expected return value (the json or xml or whatever).</description>
     </item>
     
     <item>
       <title>Testing Angular UI Modals</title>
-      <link>/2015/02/20/testing-angular-ui/</link>
+      <link>http://thejoemorgan.com/2015/02/20/testing-angular-ui/</link>
       <pubDate>Fri, 20 Feb 2015 11:07:53 +0000</pubDate>
       
-      <guid>/2015/02/20/testing-angular-ui/</guid>
+      <guid>http://thejoemorgan.com/2015/02/20/testing-angular-ui/</guid>
       <description>I recently ran into an issue while testing an modal using Angular UI Bootstrap. My goal was to create a directive that will trigger a modal to open when clicked. The directive code is relatively simple:
 app.directive(&#39;modalTrigger&#39;, [&#39;$modal&#39;, &#39;sharedData&#39;, function($modal, sharedData) { return { scope : { submitUrl : &#39;@&#39; }, link: function(scope, elem, attributes) { elem.bind(&#39;click&#39;, function() { $modal.open({ template: &amp;quot;&amp;lt;div another-directive&amp;gt;&amp;lt;/div&amp;gt;&amp;quot;, controller: &#39;AwesomeController as ac&#39;, resolve : { submitUrl : function() { return scope.</description>
     </item>
     
     <item>
       <title>Protractor in Iframe</title>
-      <link>/2015/01/08/protractor-in-iframe/</link>
+      <link>http://thejoemorgan.com/2015/01/08/protractor-in-iframe/</link>
       <pubDate>Thu, 08 Jan 2015 15:12:10 +0000</pubDate>
       
-      <guid>/2015/01/08/protractor-in-iframe/</guid>
+      <guid>http://thejoemorgan.com/2015/01/08/protractor-in-iframe/</guid>
       <description>#Working With Iframes in Protractor One of the hardest parts of legacy system is finding the confidence to refactor code. It&amp;rsquo;s not a matter of if one will have to refactor code, but rather the question is when and how much.
 If you happen to be lucky enough to inherit a well documented and well tested system, then good for you. If only we were all so lucky. Most of us inherit systems that are not so easy, but again, the need to refactor will present itself eventually.</description>
     </item>
